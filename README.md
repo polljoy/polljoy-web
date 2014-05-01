@@ -24,7 +24,7 @@ Got questions?  Email us at help@polljoy.com
 
 You can setup and manage all your polls through a web interface here https://admin.polljoy.com
 
-Note: Please note - PollJoy web plug-in requires **JQuery** 1.6 or ater  and **PHP** with **curl mod** enabled at your server end.
+Note: Please note - PollJoy web plug-in requires **JQuery** 1.6 or later  and **PHP** with **curl mod** enabled at your server end.
 
 
 # Setup

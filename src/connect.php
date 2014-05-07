@@ -1,10 +1,12 @@
 <?php
 
+/* Please update with YOUR_APP_ID that available it admin panel */
+
 $appId = 'YOUR_APP_ID';
 $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 
 /* * *Don't modify below this line*** */
- /*unset($_SESSION); */
+/* unset($_SESSION); */
 
 session_start();
 $backend = 'https://api.polljoy.com/poll/';
@@ -13,6 +15,8 @@ header('Access-Control-Allow-Origin: *');
 function getDevice() {
     $agent = $_SERVER['HTTP_USER_AGENT'];
     if (stripos($agent, 'iPad') !== false) {
+        $agent = 'mobile';
+    } elseif (stripos($agent, 'iPhone') !== false) {
         $agent = 'mobile';
     } elseif (stripos($agent, 'Android') !== false) {
         $agent = 'mobile';
@@ -24,9 +28,9 @@ function getDevice() {
 
 function getOs() {
     $agent = $_SERVER['HTTP_USER_AGENT'];
-    $agent = explode('(',$_SERVER['HTTP_USER_AGENT']);
-    $agent = explode(')',$agent[1]);
-    return array_shift(explode(';',$agent[0]));
+    $agent = explode('(', $_SERVER['HTTP_USER_AGENT']);
+    $agent = explode(')', $agent[1]);
+    return array_shift(explode(';', $agent[0]));
 }
 
 function createCurl() {
@@ -42,11 +46,10 @@ function createCurl() {
 if (isset($_GET['register'])) {
 
 
-    if(isset($_POST['deviceId']) && !($_POST['deviceId']==$_SESSION['device_id']))
-    {
+    if (isset($_POST['deviceId']) && !($_POST['deviceId'] == $_SESSION['device_id'])) {
         unset($_SESSION['current_session']);
     }
-  
+
     if (!isset($_SESSION['current_session'])) {
         $data_in = array('appId' => $appId, 'deviceId' => $deviceId);
         if (isset($_POST['deviceId'])) {
@@ -67,13 +70,37 @@ if (isset($_GET['register'])) {
 }
 
 if (isset($_GET['sg'])) {
+    $default = array(
+        'userType' => 'Non-Pay',
+        'appVersion' => '',
+        'deviceId' => '',
+        'level' => '',
+        'sessionCount' => '',
+        'timeSinceInstall' => '',
+        'tags' => '');
     $data = $_POST;
+    foreach ($default as $k => $v) {
+        if (!isset($data[$k])) {
+            $data[$k] = $v;
+        }
+    }
+ 
     
     $data['deviceModel'] = getDevice();
-    $data['platform'] = 'ios';
+    $data['platform'] = 'web';
     $data['osVersion'] = getOs();
-    
-    $a = array('appVersion', 'level', 'sessionCount', 'timeSinceInstall', 'Tags');
+
+    /*
+     * userType: 'Pay',
+      appVersion: '',
+      deviceId: '123468',
+      level: '',
+      sessionCount: '',
+      timeSinceInstall: '',
+      tags: ''
+     */
+
+    $a = array('appVersion', 'level', 'sessionCount', 'timeSinceInstall', 'tags');
     foreach ($a as $key) {
         if (trim($data[$key]) == '') {
             unset($data[$key]);
@@ -106,3 +133,5 @@ if (isset($_GET['response'])) {
     echo curl_exec($curl);
     die();
 }
+
+

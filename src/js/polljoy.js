@@ -17,7 +17,7 @@
     var level;
     var sessionCount;
     var timeSinceInstall;
-    var Tags;
+    var tags;
     var deviceId;
 
     var methods = {
@@ -37,8 +37,9 @@
                 timeSinceInstall = configuration.timeSinceInstall;
             if (typeof configuration.deviceId !== 'undefined')
                 deviceId = configuration.deviceId;
-
-            Tags = configuration.Tags;
+			if (typeof configuration.tags !== 'undefined')
+            	tags = configuration.tags;
+				
             $(thisObject).html('');
             methods.initPoll.apply(thisObject);
         },
@@ -79,7 +80,7 @@
                     level: level,
                     sessionCount: sessionCount,
                     timeSinceInstall: timeSinceInstall,
-                    Tags: Tags,
+                    tags: tags,
                     deviceId: deviceId
                 }
             }).responseText;
@@ -112,7 +113,7 @@
             var c = current;
             if (c < 0)
                 c = 0;
-            if (typeof polls[c] === 'undefined')
+            if (typeof polls === 'undefined' || typeof polls[c] === 'undefined')
             {
                 return false;
             }
@@ -161,21 +162,21 @@
             var height = jQuery('.pollContainer').height();
             var windowHeight = jQuery(window).height();
             var positionTop = parseInt((windowHeight - height) / 2);
-            if(windowHeight<height)
-                {
-                    jQuery('body').css('min-height',(height+10)+'px');
-                    jQuery('#poll').css('position','absolute');
-                    jQuery('#poll').css('height',(height+30)+'px');
-                   jQuery('.pollContainer').css('top', '0px');
-                    
-                }
-                else
-                    {
-                        jQuery('#poll').css('position','fixed');
-                    jQuery('#poll').css('height','100%');
-                        jQuery('.pollContainer').css('top', positionTop + 'px');
-                    }
-            
+            if (windowHeight < height)
+            {
+                jQuery('body').css('min-height', (height + 10) + 'px');
+                jQuery('#poll').css('position', 'absolute');
+                jQuery('#poll').css('height', (height + 30) + 'px');
+                jQuery('.pollContainer').css('top', '0px');
+
+            }
+            else
+            {
+                jQuery('#poll').css('position', 'fixed');
+                jQuery('#poll').css('height', '100%');
+                jQuery('.pollContainer').css('top', positionTop + 'px');
+            }
+
         },
         drawPlotsContainer: function()
         {
@@ -241,8 +242,8 @@
                         poll.response = response;
                         PJPollDidResponded(poll);
                     }
-                    
-                    
+
+
                     methods.drawNextQuestion.apply(thisObject);
                     return true;
                     var button = $('<input type="button" value="Next poll">');
@@ -284,7 +285,7 @@
                         poll.response = response;
                         PJPollDidResponded(poll);
                     }
-                    
+
                     var close = methods.getCloseButton(button);
                     var button = $('<p></p>');
 
@@ -324,7 +325,7 @@
             }
             else
             {
-                image = 'https://s3-us-west-1.amazonaws.com/polljoydev/library/1/d613d961eac572be972627eb4a60af91baeb31a8.png';
+                image = 'https://s3.amazonaws.com/polljoy/library/1023/05901d016df50d7ff6f7038ab7e5c041d917fe70.png';
             }
             if (!poll.mandatory)
             {
@@ -338,7 +339,17 @@
                 {
 
                     e.preventDefault();
-                    methods.drawNextQuestion.apply(thisObject);
+
+
+                    if ((current + 1) === polls.length)
+                    {
+                        methods.hide.apply(thisObject);
+                    }
+                    else
+                    {
+                        methods.drawNextQuestion.apply(thisObject);
+                    }
+
                     $.ajax({
                         url: connector + '?response=true&token=' + poll.pollToken,
                         type: 'post',
@@ -363,13 +374,13 @@
             if (reward > 0)
             {
                 var rewObject = $('<div>Reward:<p>' + reward + '</p></div>').css('float', 'right').css('margin-right', '50px').css('text-align', 'center');
-                rewObject.find('p').css('margin', '4px 0').css('font-weight', 'bold').css('font-size', '16px');
+                rewObject.find('p').css('margin', '4px 0').css('font-weight', 'bold').css('font-size', '15px');
                 container.append(rewObject);
             }
 
             container.append($('<img src="' + image + '"></img>').css('float', 'left').css('max-width', '20%').css('height', 'auto').css('display', 'block'));
             container.append($('<div></div>').css('clear', 'both'));
-            container.append($('<p>' + poll.pollText + '</p>'));
+            container.append($('<p>' + poll.pollText + '</p>').css('font-size', '15px').css('font-family', 'arial'));
             if (poll.type === 'T')
             {
                 container.append($('<textarea required="required"></textarea>').css('display', 'block').css('color', '#000').css('background', '#fff').css('min-height', '80px'));
@@ -382,7 +393,7 @@
             }
             else
             {
-                var choices = poll.choice.split(',');
+                var choices = poll.choices;
                 $(choices).each(function(k, v)
                 {
                     var button = $('<a href="#">' + v + '</a>').click(function(e)
@@ -403,7 +414,7 @@
         },
         setButtonCss: function(object)
         {
-            return object.css('border', '0px').css('cursor', 'pointer').css('padding', '4px').css('border-radius', '4px').css('background', '#' + buttonColor).css('color', '#' + font).css('text-decoration', 'none');
+            return object.css('font-size', '15px').css('font-family', 'arial').css('border', '0px').css('cursor', 'pointer').css('padding', '4px').css('border-radius', '4px').css('background', '#' + buttonColor).css('color', '#' + font).css('text-decoration', 'none');
         },
         submitCurrentPoll: function()
         {

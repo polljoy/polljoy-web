@@ -1,4 +1,4 @@
-[Picture](http://www.polljoy.com/assets/images/logo/logo.png)
+![Picture](http://www.polljoy.com/assets/images/logo/logo.png)
 
 > In-app polls made easy. Integrate in 2 lines of code.
 

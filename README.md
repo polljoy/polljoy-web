@@ -70,7 +70,7 @@ After you installed the PHP file in your server end and include the Javascript f
 
 This is the simplest wayt to connect your webapp to the server end and start session to polljoy. And get polls from polljoy. When polls are returned, you will need to handle them and present the polls with the callbacks (check below).
 
-You can pass more selection criteria that match your poll settings in [admin panel](https://admin.polljoy.com). It looks like:
+You can pass more selection criterias that match your poll settings in [admin panel](https://admin.polljoy.com). It looks like:
 
 ``` html
 <javascript>
@@ -78,13 +78,12 @@ You can pass more selection criteria that match your poll settings in [admin pan
             {
                 polljoy({
                     endPoint: 'URL/TO/YOUR/SERVER/END/connect.php',
-                    deviceId: 'DEVICE_ID',
+                    deviceId: 'DEVCIE_id',
                     userType: 'USER_TYPE',
                     appVersion: 'APP_VERSION',
                     level: 'LEVEL',
                     sessionCount: 'SESSION_COUNT',
-                    timeSinceInstall: 'TIME_SINCE_INSTALL',
-                    tags: 'TAG1#1-2,TAG2#10-14'
+                    timeSinceInstall: 'TIME_SINCE_INSTALL'
                 });
             });
 </script>
@@ -183,7 +182,7 @@ Status can be:
  
 ### Poll object data structure
 
-All callbacks will return the associated poll in JSON format. data structure will look like:
+All callbacks will returnt the associated poll in JSON format. data structure will look like:
 
 ```
 active: true
@@ -231,7 +230,6 @@ virtualAmount: null
 virtualCurrency: null
 ```
 
-note: the API may regular update to open more data. Please always check the return JSON data for the latest data structure.
 
  For callback:
 
@@ -246,11 +244,6 @@ note: the API may regular update to open more data. Please always check the retu
 #### Got questions? Email us at help@polljoy.com
 
 ## Version History
-
-### Version 1.1-BETA
-- Pre-release version supports new UI settings.
-- All new features are in SANDBOX and not available in production yet.
-- Please contact help@polljoy.com if you want to beta test.
 
 ### Version 0.1
 - Initial beta release

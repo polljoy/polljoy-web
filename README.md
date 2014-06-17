@@ -29,7 +29,7 @@ NOTE: Please note - PollJoy web plug-in requires **JQuery** 1.6 or later  and **
 
 # Setup
 
-1. Copy the files under src folder to your server end which can be accessable from your web app.
+1. Copy the files under src folder to your server end which can be accessible from your web app.
 
 ```
 src\connect.php
@@ -68,9 +68,9 @@ After you installed the PHP file in your server end and include the Javascript f
 </script>
 ```
 
-This is the simplest wayt to connect your webapp to the server end and start session to polljoy. And get polls from polljoy. When polls are returned, you will need to handle them and present the polls with the callbacks (check below).
+This is the simplest way to connect your webapp to the server end and start session to polljoy. And get polls from polljoy. When polls are returned, you will need to handle them and present the polls with the callbacks (check below).
 
-You can pass more selection criterias that match your poll settings in [admin panel](https://admin.polljoy.com). It looks like:
+You can pass more selection criteria that match your poll settings in [admin panel](https://admin.polljoy.com). It looks like:
 
 ``` html
 <javascript>
@@ -78,12 +78,13 @@ You can pass more selection criterias that match your poll settings in [admin pa
             {
                 polljoy({
                     endPoint: 'URL/TO/YOUR/SERVER/END/connect.php',
-                    deviceId: 'DEVCIE_id',
+                    deviceId: 'DEVICE_ID',
                     userType: 'USER_TYPE',
                     appVersion: 'APP_VERSION',
                     level: 'LEVEL',
                     sessionCount: 'SESSION_COUNT',
-                    timeSinceInstall: 'TIME_SINCE_INSTALL'
+                    timeSinceInstall: 'TIME_SINCE_INSTALL',
+                    tags: 'TAGS,TAGS#1-123'
                 });
             });
 </script>
@@ -102,6 +103,7 @@ All the parameters are optional.
 
 `TIME_SINCE_INSTALL` - if your app track how long your users have been using your app, you can pass this to select the right poll.
 
+`TAGS,TAGS#1-123` - if you app use tags to select polls, you pass the tags here. Please remember this needs to match your settings in admin panel.
 
 ### Handle callbacks from plug-in (optional)
 
@@ -182,7 +184,7 @@ Status can be:
  
 ### Poll object data structure
 
-All callbacks will returnt the associated poll in JSON format. data structure will look like:
+All callbacks will return the associated poll in JSON format. data structure will look like:
 
 ```
 active: true
@@ -230,6 +232,7 @@ virtualAmount: null
 virtualCurrency: null
 ```
 
+note: The API will regularly update to open more data. Please always check the returned JSON data for the latest data structure if you need to use it.
 
  For callback:
 
@@ -244,6 +247,11 @@ virtualCurrency: null
 #### Got questions? Email us at help@polljoy.com
 
 ## Version History
+
+### Version 1.1-BETA
+- Pre-release for new UI custom settings & features.
+- Currently available in SANDBOX only (not for production)
+- Please contact help@polljoy.com if you want to beta test
 
 ### Version 0.1
 - Initial beta release

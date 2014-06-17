@@ -10,6 +10,7 @@ $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 
 session_start();
 $backend = 'https://api.polljoy.com/poll/';
+//$backend = 'http://apisandbox.polljoy.com/poll/';
 header('Access-Control-Allow-Origin: *');
 
 function getDevice() {
@@ -108,6 +109,7 @@ if (isset($_GET['sg'])) {
     }
     if (!isset($data['deviceId']) || strlen($data['deviceId']) == 0) {
         $data['deviceId'] = $deviceId;
+        $data['deviceId'] = $_SESSION['device_id'];
     }
     $curl = createCurl();
     curl_setopt($curl, CURLOPT_URL, $backend . 'smartget.json');
@@ -126,6 +128,7 @@ if (isset($_GET['response'])) {
     $data = $_POST;
     if (!isset($data['deviceId']) || strlen($data['deviceId']) == 0) {
         $data['deviceId'] = $deviceId;
+        $data['deviceId'] = $_SESSION['device_id'];
     }
     $curl = createCurl();
     curl_setopt($curl, CURLOPT_URL, $backend . 'response/' . $_GET['token'] . '.json');

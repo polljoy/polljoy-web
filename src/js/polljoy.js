@@ -1,11 +1,10 @@
 (function($) {
-
-
     var connector = '';
     var background = '';
     var border = '';
     var font = '';
     var buttonColor = '';
+    var app;
     var polls;
     var sessionId;
     var current = -1;
@@ -19,6 +18,8 @@
     var timeSinceInstall;
     var tags;
     var deviceId;
+    var orientation;
+    var timer;
 
     var methods = {
         init: function init(configuration)
@@ -59,6 +60,8 @@
                 console.log('registerSession.json returned error!');
                 return false;
             }
+
+            app = response.app;
 
             background = response.app.backgroundColor;
             border = response.app.borderColor;
@@ -103,10 +106,6 @@
                     PJPollNotAvailable(sgResponse.status);
                 }
             }
-            setInterval(function() {
-                methods.centerThePoll();
-            }, 100);
-
         },
         show: function()
         {
@@ -130,13 +129,15 @@
             {
                 PJPollDidShow(poll);
             }
+
+            methods.bindEvents.apply(thisObject);
         },
         hide: function()
         {
             var c = current;
             if (c < 0)
                 c = 0;
-            $('#poll').fadeOut(300);//css('display', 'none');
+            $('#polljoy_poll').fadeOut(100);//css('display', 'none');
 
             if (typeof polls[c] === 'undefined' || typeof polls[c].PollRequest === 'undefined')
             {
@@ -150,7 +151,7 @@
                 PJPollWillDismiss(poll);
             }
 
-
+            methods.unbindEvents.apply(thisObject);
 
             if (typeof PJPollDidDismiss === 'function')
             {
@@ -160,27 +161,27 @@
         centerThePoll: function()
         {
             var height = jQuery('.pollContainer').height();
-            var windowHeight = jQuery(window).height();
+            var windowHeight = window.innerHeight;
             var positionTop = parseInt((windowHeight - height) / 2);
             if (windowHeight < height)
             {
-                jQuery('body').css('min-height', (height + 10) + 'px');
-                jQuery('#poll').css('position', 'absolute');
-                jQuery('#poll').css('height', (height + 30) + 'px');
+                jQuery('#polljoy_poll').css('position', 'absolute');
+                jQuery('#polljoy_poll').css('height', (height + 30) + 'px');
                 jQuery('.pollContainer').css('top', '0px');
-
             }
             else
             {
-                jQuery('#poll').css('position', 'fixed');
-                jQuery('#poll').css('height', '100%');
+                jQuery('#polljoy_poll').css('position', 'fixed');
+                jQuery('#polljoy_poll').css('height', '100%');
                 jQuery('.pollContainer').css('top', positionTop + 'px');
             }
 
         },
         drawPlotsContainer: function()
         {
-            $('#poll').fadeIn(300);
+            orientation = 'L';
+
+            $('#polljoy_poll').fadeIn(100);
 
             if (typeof polls === 'undefined' || polls.length === 0)
             {
@@ -188,21 +189,15 @@
             }
             if (!container)
             {
-                container = $('<div></div>')
-                        .addClass('pollContainer')
-                        .css('padding', '10px')
-                        .css('max-width', '300px')
-                        .css('width', 'calc(90% - 26px)')
-                        .css('background', '#' + background)
-                        .css('border', '3px solid #' + border)
-                        .css('border-radius', '5px')
-                        .css('position', 'relative')
-                        .css('margin', 'auto')
-                        .css('top', '100px')
-                        .css('color', '#' + font);
-                $(thisObject).html('');
-                $(thisObject).append(container);
-                methods.drawNextQuestion.apply(thisObject);
+                $.get('https://res.polljoy.com/PJPollview.php', function(data){
+                    container = $(data);
+                    $(thisObject).html('');
+                    $(thisObject).append(container);
+                    methods.adjustLayoutSize.apply(thisObject);
+                    methods.switchOrientation.apply(thisObject);
+                    methods.layoutView.apply(thisObject);
+                    methods.drawNextQuestion.apply(thisObject);
+                });
             }
             else
             {
@@ -211,12 +206,7 @@
         },
         getCloseButton: function()
         {
-            return $('<a href="#">✖</a>')
-                    .css('position', 'absolute')
-                    .css('right', '10px')
-                    .css('top', '10px')
-                    .css('color', '#' + font)
-                    .css('text-decoration', 'none').click(function()
+            return jQuery('#polljoe_pollview_close_btn').click(function()
             {
                 methods.hide.apply(thisObject);
             });
@@ -224,7 +214,9 @@
         drawFinaliseQuestion: function()
         {
             var poll = polls[current].PollRequest;
-            container.html(polls[current].PollRequest.customMessage);
+            jQuery('#polljoy_pollview_question_text').html(poll.customMessage);
+            jQuery('#polljoy_pollview_reward').hide();
+            jQuery('#polljoy_pollview_collect').unbind('click');
 
             if (typeof(polls[current + 1]) !== 'undefined')
             {
@@ -232,81 +224,51 @@
                 var reward = parseInt(poll.virtualAmount);
                 if (reward > 0)
                 {
-                    var button = $('<input type="button" value="Collect">');
+                    var button = $('<a href="#">' + poll.collectButtonText + '</a>');
+
+                    button = methods.setButtonCss(button);
+                    jQuery('#polljoy_pollview_collect').html(button).click(function(e)
+                    {
+                        methods.drawNextQuestion.apply(thisObject);
+                    });
+                    jQuery('#polljoy_pollview_mc_choices').hide();
+                    jQuery('#polljoy_pollview_openend').hide();
+                    jQuery('#polljoy_pollview_thankyou').show();
                 }
                 else
                 {
-                    var close = methods.getCloseButton(button);
-                    if (typeof PJPollDidResponded === 'function')
-                    {
-                        poll.response = response;
-                        PJPollDidResponded(poll);
-                    }
-
-
                     methods.drawNextQuestion.apply(thisObject);
                     return true;
-                    var button = $('<input type="button" value="Next poll">');
                 }
-
-                button.click(function(e)
-                {
-                    if (typeof PJPollDidResponded === 'function')
-                    {
-                        poll.response = response;
-                        PJPollDidResponded(poll);
-                    }
-                    methods.drawNextQuestion.apply(thisObject);
-                });
-                var p = $('<p></p>').append(button);
-                button = methods.setButtonCss(button);
-                container.append(p);
             }
             else
             {
                 var reward = parseInt(poll.virtualAmount);
                 if (reward > 0)
                 {
-                    var button = $('<input type="button" value="collect">').click(function()
-                    {
-                        if (typeof PJPollDidResponded === 'function')
-                        {
-                            poll.response = response;
-                            PJPollDidResponded(poll);
-                        }
-                        methods.hide.apply(thisObject);
-                    });
-                    button = methods.setButtonCss(button);
+                    var button = $('<a href="#">' + poll.collectButtonText + '</a>');
                 }
                 else
                 {
-                    if (typeof PJPollDidResponded === 'function')
-                    {
-                        poll.response = response;
-                        PJPollDidResponded(poll);
-                    }
-
-                    var close = methods.getCloseButton(button);
-                    var button = $('<p></p>');
-
+                    var button = $('<a href="#">' + poll.thankyouButtonText + '</a>');
                 }
 
-                var p = $('<p></p>').append(button);
-
-                container.append(p);
+                button = methods.setButtonCss(button);
+                jQuery('#polljoy_pollview_collect').html(button).click(function()
+                {
+                    methods.hide.apply(thisObject);
+                });
+                jQuery('#polljoy_pollview_mc_choices').hide();
+                jQuery('#polljoy_pollview_openend').hide();
+                jQuery('#polljoy_pollview_thankyou').show();
             }
 
-            if (typeof close !== undefined)
-            {
-                container.append(close);
-            }
-
-
+            jQuery('#polljoy_pollview_close_btn').hide();
         },
         drawNextQuestion: function()
         {
+
             current++;
-            container.html('');
             if (typeof polls[current] === 'undefined')
             {
                 methods.finish.apply(thisObject);
@@ -315,112 +277,186 @@
             var poll = polls[current].PollRequest;
             var image;
 
-            if (poll.pollImageUrl !== null)
+            app = poll.app;
+            methods.layoutView.apply(thisObject);
+
+            if ((poll.pollImageUrl !== null) && (poll.pollImageUrl.length > 0))
             {
                 image = poll.pollImageUrl;
+                jQuery('#polljoy_pollview_thumbnail').css('border-radius',poll.imageCornerRadius + 'px' );
             }
-            else if (poll.appImageUrl !== null)
+            else if ((poll.app.defaultImageUrl !== null) && (poll.app.defaultImageUrl.length > 0))
             {
                 image = poll.appImageUrl;
+                jQuery('#polljoy_pollview_thumbnail').css('border-radius',poll.app.imageCornerRadius + 'px');
             }
-            else
-            {
-                image = 'https://s3.amazonaws.com/polljoy/library/1023/05901d016df50d7ff6f7038ab7e5c041d917fe70.png';
+            else {
+                image = 'https://res.polljoy.com/img/filler.png';
             }
+
+            jQuery('#polljoy_pollview_thumbnail').attr('src',image);
+
             if (!poll.mandatory)
             {
-                var next = $('<a href="#">✖</a>')
-                        .css('position', 'absolute')
-                        .css('right', '10px')
-                        .css('top', '10px')
-                        .css('color', '#' + font)
-                        .css('text-decoration', 'none')
-                        .click(function(e)
-                {
+                if ((poll.app.closeButtonImageUrl !== null) && (poll.app.closeButtonImageUrl.length > 0)) {
+                    jQuery('#polljoy_pollview_close_btn').css('background-image','url("'+poll.app.closeButtonImageUrl+'")');
+                    jQuery('#polljoy_pollview_close_btn').css('color','transparent');
+                }
+                else {
+                    jQuery('#polljoy_pollview_close_btn').css('background-image','');
+                    jQuery('#polljoy_pollview_close_btn').css('color','#'+poll.app.fontColor);
+                }
 
-                    e.preventDefault();
-
-
-                    if ((current + 1) === polls.length)
+                jQuery('#polljoy_pollview_close_btn').unbind('click');
+                var next = jQuery('#polljoy_pollview_close_btn')
+                    .click(function(e)
                     {
-                        methods.hide.apply(thisObject);
-                    }
-                    else
-                    {
-                        methods.drawNextQuestion.apply(thisObject);
-                    }
 
-                    $.ajax({
-                        url: connector + '?response=true&token=' + poll.pollToken,
-                        type: 'post',
-                        async: true,
-                        dataType: 'json',
-                        data: {
-                            sessionId: sessionId,
-                            response: '',
-                            deviceId: deviceId
+                        e.preventDefault();
+
+                        if ((current + 1) === polls.length)
+                        {
+                            methods.hide.apply(thisObject);
+                        }
+                        else
+                        {
+                            methods.drawNextQuestion.apply(thisObject);
+                        }
+
+                        $.ajax({
+                            url: connector + '?response=true&token=' + poll.pollToken,
+                            type: 'post',
+                            async: true,
+                            dataType: 'json',
+                            data: {
+                                sessionId: sessionId,
+                                response: '',
+                                deviceId: deviceId
+                            }
+                        });
+
+                        if (typeof PJPollDidSkipped === 'function')
+                        {
+                            PJPollDidSkipped(poll);
                         }
                     });
-
-                    if (typeof PJPollDidSkipped === 'function')
-                    {
-                        PJPollDidSkipped(poll);
-                    }
-                });
-                container.append(next);
             }
 
             var reward = parseInt(poll.virtualAmount);
             if (reward > 0)
             {
-                var rewObject = $('<div>Reward:<p>' + reward + '</p></div>').css('float', 'right').css('margin-right', '50px').css('text-align', 'center');
-                rewObject.find('p').css('margin', '4px 0').css('font-weight', 'bold').css('font-size', '15px');
-                container.append(rewObject);
+                if ((poll.pollRewardImageUrl !== null) && (poll.pollRewardImageUrl.length > 0)) {
+                    jQuery('#polljoy_pollview_reward_image').css('background-image','url("'+poll.pollRewardImageUrl+'")');
+                    jQuery('#polljoy_pollview_reward_image2').css('background-image','url("'+poll.pollRewardImageUrl+'")');
+                }
+                else {
+                    jQuery('#polljoy_pollview_reward_image').css('background-image','');
+                    jQuery('#polljoy_pollview_reward_image2').css('background-image','');
+                }
+
+                jQuery('#polljoy_pollview_reward_earn_amount').html(reward);
+                jQuery('#polljoy_pollview_reward_earn_amount2').html(reward);
+                jQuery('#polljoy_pollview_reward').show();
+                jQuery('#polljoy_pollview_thankyou_reward').show();
+            }
+            else {
+                jQuery('#polljoy_pollview_reward').hide();
+                jQuery('#polljoy_pollview_thankyou_reward').hide();
             }
 
-            container.append($('<img src="' + image + '"></img>').css('float', 'left').css('max-width', '20%').css('height', 'auto').css('display', 'block'));
-            container.append($('<div></div>').css('clear', 'both'));
-            container.append($('<p>' + poll.pollText + '</p>').css('font-size', '15px').css('font-family', 'arial'));
+            jQuery('#polljoy_pollview_question_text').html(poll.pollText);
+
             if (poll.type === 'T')
             {
-                container.append($('<textarea required="required"></textarea>').css('display', 'block').css('color', '#000').css('background', '#fff').css('min-height', '80px'));
-                var submit = $('<input type="button" value="Submit"></input>').click(function()
+                jQuery('#polljoy_pollview_openend_asnwer')
+                    .html($('<textarea required="required"></textarea>')
+                        .css('display', 'block')
+                        .css('color', '#000')
+                        .css('background', '#fff')
+                        .css('width', '100%')
+                        .css('height','100%')
+                        .css('resize','none')
+                        .css('border','#000 1px solid')
+                        .css('padding','5px')
+                        .css('margin','0')
+                    );
+
+                jQuery('#polljoy_pollview_mc_choices').hide();
+                jQuery('#polljoy_pollview_openend').show();
+                jQuery('#polljoy_pollview_thankyou').hide();
+
+                var submit = $('<a href="#">' + poll.submitButtonText + '</a>');
+                submit = methods.setButtonCss(submit);
+                jQuery('#polljoy_pollview_submit').unbind( 'click' );
+                jQuery('#polljoy_pollview_submit').html(submit).click(function()
                 {
                     methods.submitCurrentPoll.apply(thisObject);
                 });
-                submit = methods.setButtonCss(submit);
-                container.append(submit);
             }
             else
             {
                 var choices = poll.choices;
+                var offset = 4 - poll.choices.length;
+                var deltaAdjust = orientation == 'L' ? 0.5: 0;
+
+                // hide all button then relayout
+                $("[id^='polljoy_pollview_row_button']").each(function() {
+                    $(this).hide();
+                });
+
+                jQuery('#polljoy_pollview_mc_choices').css('height',(deltaAdjust + poll.choices.length*(100/4)) + '%');
+                $('.polljoy-pollview-row-button').css('height',(deltaAdjust + 100/poll.choices.length) + '%');
+
                 $(choices).each(function(k, v)
                 {
-                    var button = $('<a href="#">' + v + '</a>').click(function(e)
+                    var button = $('<a href="#">' + v + '</a>');
+                    var thisButton='polljoy_pollview_button' + offset;
+                    button = methods.setButtonCss(button);
+                    jQuery('#'+thisButton).html(button).unbind( 'click' );
+                    jQuery('#'+thisButton).html(button).click(function(e)
                     {
                         e.preventDefault();
                         $(container).find('a').removeClass('selected');
-                        $(this).addClass('selected');
+                        $(button).addClass('selected');
                         methods.submitCurrentPoll.apply(thisObject);
                     });
-                    button = methods.setButtonCss(button);
-                    button.css('width', '95%').css('display', 'block');
-                    var con = $('<p></p>').append(button).css('margin', '10px auto');
-                    $(container).append(con);
+                    jQuery('#polljoy_pollview_row_button' + offset).show();
+                    offset++;
                 });
+                jQuery('#polljoy_pollview_mc_choices').show();
+                jQuery('#polljoy_pollview_openend').hide();
+                jQuery('#polljoy_pollview_thankyou').hide();
             }
-
-
         },
         setButtonCss: function(object)
         {
-            return object.css('font-size', '15px').css('font-family', 'arial').css('border', '0px').css('cursor', 'pointer').css('padding', '4px').css('border-radius', '4px').css('background', '#' + buttonColor).css('color', '#' + font).css('text-decoration', 'none');
+            return object.css('color', 'inherit').css('text-decoration', 'none').css('width','100%').css('height','100%');;
+        },
+        setButtonSize: function()
+        {
+            var poll = polls[current].PollRequest;
+            var choices = poll.choices;
+            var offset = 4 - poll.choices.length;
+            var deltaAdjust = orientation == 'L' ? 0.5: 0;
+
+            // hide all button then relayout
+            $("[id^='polljoy_pollview_row_button']").each(function() {
+                $(this).hide();
+            });
+
+            jQuery('#polljoy_pollview_mc_choices').css('height',(deltaAdjust + poll.choices.length*(100/4)) + '%');
+            jQuery('#polljoy_pollview_mc_choices').css('max-height',(deltaAdjust + poll.choices.length*(100/4)) + '%');
+            jQuery('.polljoy-pollview-row-button').css('max-height',(deltaAdjust + 100/poll.choices.length) + '%');
+            jQuery('.polljoy-pollview-row-button').css('height',(deltaAdjust + 100/poll.choices.length) + '%');
+
+            $(choices).each(function(k, v)
+                {
+                    jQuery('#polljoy_pollview_row_button' + offset).show();
+                    offset++;
+                });
         },
         submitCurrentPoll: function()
         {
-
-
-
             var poll = polls[current].PollRequest;
             if (poll.type === 'T' && container.find('textarea').val() === '')
             {
@@ -437,8 +473,11 @@
                 response = container.find('.selected').html();
             }
 
-            $(container).find('input[type="button"]').after($('<img src="http://4.bp.blogspot.com/-u4GSUmmuOr0/UCJtVBoV_RI/AAAAAAAAAO0/pChKQuf82EE/s1600/ajax-loader.gif"></img>'));
-            $(container).find('input[type="button"]').remove();
+            if (typeof PJPollDidResponded === 'function')
+            {
+                poll.response = response;
+                PJPollDidResponded(poll);
+            }
 
             $.ajax({
                 url: connector + '?response=true&token=' + poll.pollToken,
@@ -451,15 +490,380 @@
                     deviceId: deviceId
                 }
             });
+
             methods.drawFinaliseQuestion.apply(thisObject);
 
+            // open external URL
+            var targetUrls=poll.choiceUrl;
+            if (poll.type === 'M')
+            {
+                if ((targetUrls[response]['web'] !== null) && (targetUrls[response]['web'].length > 0))
+                {
+                    window.open(targetUrls[response]['web'], '_blank');
+                }
+            }
         },
         finish: function()
         {
-            var close = methods.getCloseButton();
+            var poll = polls[current - 1].PollRequest;
+            jQuery('#polljoy_pollview_question_text').html(poll.customMessage);
+            jQuery('#polljoy_pollview_reward').hide();
 
-            container.html(polls[current - 1].PollRequest.customMessage);
-            container.append(close);
+            var button = $('<a href="#">' + poll.thankyouButtonText + '</a>');
+            button = methods.setButtonCss(button);
+            jQuery('#polljoy_pollview_collect').html(button).click(function()
+            {
+                methods.hide.apply(thisObject);
+            });
+            jQuery('#polljoy_pollview_mc_choices').hide();
+            jQuery('#polljoy_pollview_openend').hide();
+            jQuery('#polljoy_pollview_thankyou').show();
+        },
+        setCloseButtonLocation: function()
+        {
+            // set close button location
+            loc = app.closeButtonLocation;
+            offsetX = app.closeButtonOffsetY;
+            offsetY = app.closeButtonOffsetX;
+            offsetX = offsetX * (jQuery('#polljoy_pollview_main').width() / 1120);
+            //offsetY = offsetY * (jQuery('#polljoy_pollview_main').height() / 1500);
+            offsetY = offsetY * (jQuery('#polljoy_pollview_main').width() / 1120);
+
+            if (orientation=='L') {
+                jQuery('#polljoy_pollview_close_btn').css('height','5%');
+                jQuery('#polljoy_pollview_close_btn').css('width',jQuery('#polljoy_pollview_close_btn').css('height'));
+                var padding = parseInt($('#polljoy_pollview_main').height() * 0.025);
+                var totalWidth = (jQuery('#polljoy_pollview_reward_image').width()+jQuery('#polljoy_pollview_reward_earn').width());
+                var padding2 = (jQuery('#polljoy_pollview_thumbnail').width() - totalWidth)/2;
+                jQuery('#polljoy_pollview_close_btn').css('margin',padding+'px');
+                jQuery('.polljoy-pollview-row-question-landscape').css('margin-top',jQuery('.polljoy-pollview-thumbnail').css('margin'));
+            }
+            else {
+                jQuery('#polljoy_pollview_close_btn').css('height','3.75%');
+                jQuery('#polljoy_pollview_close_btn').css('width',jQuery('#polljoy_pollview_close_btn').css('height'));
+                var padding = parseInt(jQuery('#polljoy_pollview_main').height() * 0.01875);
+                var refWidth = (jQuery('#polljoy_pollview_main').width() - jQuery('#polljoy_pollview_thumbnail').width()) /2;
+                var totalWidth = (jQuery('#polljoy_pollview_reward_image').width()+jQuery('#polljoy_pollview_reward_earn').width());
+                var padding2 = (refWidth - totalWidth)/2;
+                jQuery('#polljoy_pollview_close_btn').css('margin',padding+'px');
+            }
+
+            if (loc==0) {
+                jQuery('#polljoy_pollview_close_btn').css('left', offsetX + 'px');
+                jQuery('#polljoy_pollview_close_btn').css('top', offsetY + 'px');
+                jQuery('#polljoy_pollview_close_btn').css('right','');
+                jQuery('#polljoy_pollview_close_btn').css('float','left');
+
+                if (orientation=='L') {
+                    var rewardCss = $('#polljoy_pollview_reward').css('cssText');
+                    if ($("#polljoy_pollview_reward").is(':hidden')) {
+                        $('#polljoy_pollview_reward').css('cssText', 'bottom: ' + (parseInt(parseInt($('#polljoy_pollview_answer').css('height'))/2)-5) + 'px !important; display:none');
+                    }
+                    else {
+                        $('#polljoy_pollview_reward').css('cssText', 'bottom: ' + (parseInt(parseInt($('#polljoy_pollview_answer').css('height'))/2)-5) + 'px !important;');
+                    }
+                    jQuery('#polljoy_pollview_reward').css('left','auto');
+                    jQuery('#polljoy_pollview_reward').css('right',padding2+'px');
+                    jQuery('#polljoy_pollview_reward').css('width',totalWidth+'px');
+                    jQuery('#polljoy_pollview_reward').css('top','auto');
+                    jQuery('.polljoy-pollview-thumbnail-landscape').css('cssText','float: right !important;');
+                    jQuery('#polljoy_pollview_question').css('cssText','float: left !important; left: 0% !important; right: auto !important;');
+                    jQuery('#polljoy_pollview_answer').css('cssText','float: left !important; right: auto !important;');
+
+                }
+                else {
+                    jQuery('#polljoy_pollview_reward').css('left','auto');
+                    jQuery('#polljoy_pollview_reward').css('width',totalWidth+'px');
+                    jQuery('#polljoy_pollview_reward').css('right',padding2+'px');
+                    jQuery('.polljoy-pollview-thumbnail-landscape').css('float','');
+                    jQuery('#polljoy_pollview_question').css('cssText','');
+                    jQuery('#polljoy_pollview_answer').css('cssText','');
+                }
+            }
+            else {
+                jQuery('#polljoy_pollview_close_btn').css('right', offsetX + 'px');
+                jQuery('#polljoy_pollview_close_btn').css('top', offsetY + 'px');
+                jQuery('#polljoy_pollview_close_btn').css('left','');
+                jQuery('#polljoy_pollview_close_btn').css('float','right');
+
+                if (orientation=='L') {
+                    if ($("#polljoy_pollview_reward").is(':hidden')) {
+                        $('#polljoy_pollview_reward').css('cssText', 'bottom: ' + (parseInt(parseInt($('#polljoy_pollview_answer').css('height'))/2)-5) + 'px !important; display:none');
+                    }
+                    else {
+                        $('#polljoy_pollview_reward').css('cssText', 'bottom: ' + (parseInt(parseInt($('#polljoy_pollview_answer').css('height'))/2)-5) + 'px !important;');
+                    }
+                    jQuery('#polljoy_pollview_reward').css('left',padding2+'px');
+                    jQuery('#polljoy_pollview_reward').css('right','auto');
+                    jQuery('#polljoy_pollview_reward').css('width',totalWidth+'px');
+                    jQuery('#polljoy_pollview_reward').css('top','auto');
+                    jQuery('.polljoy-pollview-thumbnail-landscape').css('cssText','float: left !important;');
+                    jQuery('#polljoy_pollview_question').css('cssText','float: right !important; right: 0% !important;');
+                    jQuery('#polljoy_pollview_answer').css('cssText','float: right !important; right: 0% !important;');
+                }
+                else {
+                    jQuery('#polljoy_pollview_reward').css('left',padding2+'px');
+                    jQuery('#polljoy_pollview_reward').css('right','auto');
+                    jQuery('#polljoy_pollview_reward').css('width',totalWidth+'px');
+                    jQuery('.polljoy-pollview-thumbnail-landscape').css('float','');
+                    jQuery('#polljoy_pollview_question').css('cssText','');
+                    jQuery('#polljoy_pollview_answer').css('cssText','');
+                }
+            }
+
+            jQuery('#polljoy_pollview_close_btn').css('font-size',jQuery('#polljoy_pollview_close_btn').width()+'px');
+        },
+        switchOrientation: function()
+        {
+            if (orientation=='L') {
+                jQuery('#polljoy_pollview_overlay').addClass('polljoy-pollview-size-web-landscape');
+                jQuery('#polljoy_pollview_background').addClass('polljoy-pollview-inner-web-landscape');
+                jQuery('#polljoy_pollview_main').addClass('polljoy-pollview-inner-web-landscape');
+                jQuery('#polljoy_pollview_reward').addClass('polljoy-pollview-reward-landscape');
+                jQuery('.polljoy-pollview-thumbnail').addClass('polljoy-pollview-thumbnail-landscape');
+                jQuery('.polljoy-pollview-row-question').addClass('polljoy-pollview-row-question-landscape');
+                jQuery('.polljoy-pollview-answer').addClass('polljoy-pollview-answer-landscape');
+                jQuery('.polljoy-pollview-row-button').addClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-openend').addClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-submit').addClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-collect').addClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-thankyou').addClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-collect').addClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-reward').addClass('polljoy-pollview-reward-landscape');
+                if (jQuery("#polljoy_pollview_reward").is(':hidden')) {
+                    jQuery('#polljoy_pollview_reward').css('cssText', 'bottom: ' + (parseInt(parseInt($('#polljoy_pollview_answer').css('height'))/2)-5) + 'px !important; display:none');
+                }
+                else {
+                    jQuery('#polljoy_pollview_reward').css('cssText', 'bottom: ' + (parseInt(parseInt($('#polljoy_pollview_answer').css('height'))/2)-5) + 'px !important;');
+                }
+
+                jQuery('.polljoy-pollview-row-question-landscape').css('fontSize','1.2em');
+                jQuery('.polljoy-pollview-row-question-landscape').css('width',$('#polljoy_pollview').width() - $('.polljoy-pollview-thumbnail-landscape').width() - parseInt($('.polljoy-pollview-thumbnail-landscape').css('margin-left')) * 3 +'px');
+                jQuery('.polljoy-pollview-row-question-landscape').css('margin-left',$('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-row-question-landscape').css('margin-right',$('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-answer-landscape').css('width',$('#polljoy_pollview').width() - $('.polljoy-pollview-thumbnail-landscape').width() - parseInt($('.polljoy-pollview-thumbnail-landscape').css('margin-left')) * 3 +'px');
+                jQuery('.polljoy-pollview-answer-landscape').css('margin-left',$('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-answer-landscape').css('margin-right',$('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-answer-landscape').css('bottom',(parseInt($('.polljoy-pollview-thumbnail-landscape').css('margin-left'))/2)+'px');
+                jQuery('.polljoy-pollview-row-button-landscape').css('padding-bottom',$('#polljoy_pollview').height() * 0.025);
+                jQuery('.polljoy-pollview-row-button-landscape').css('height','25.5%');
+                jQuery('#polljoy_pollview_row_openend').css('height','');
+            }
+            else {
+                jQuery('.polljoy-pollview-row-button-landscape').css('cssText','');
+                jQuery('#polljoy_pollview_overlay').removeClass('polljoy-pollview-size-web-landscape');
+                jQuery('#polljoy_pollview_background').removeClass('polljoy-pollview-inner-web-landscape');
+                jQuery('#polljoy_pollview_main').removeClass('polljoy-pollview-inner-web-landscape');
+                jQuery('#polljoy_pollview_reward').removeClass('polljoy-pollview-reward-landscape');
+                jQuery('.polljoy-pollview-thumbnail').removeClass('polljoy-pollview-thumbnail-landscape');
+                jQuery('.polljoy-pollview-row-question').removeClass('polljoy-pollview-row-question-landscape');
+                jQuery('.polljoy-pollview-answer').removeClass('polljoy-pollview-answer-landscape');
+                jQuery('.polljoy-pollview-row-button').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-openend').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-submit').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-collect').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-thankyou').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-collect').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-reward').removeClass('polljoy-pollview-reward-landscape');
+                jQuery('#polljoy_pollview_reward').css('bottom','');
+                jQuery('.polljoy-pollview-thumbnail').css('float','');
+                jQuery('#polljoy_pollview_question').css('cssText','');
+                jQuery('#polljoy_pollview_answer').css('cssText','');
+                //setCloseButtonLocation();
+            }
+        },
+        layoutView: function()
+        {
+            // close button
+            if (orientation=='P') {
+                jQuery('#polljoy_pollview_close_btn').css('height','3.75%');
+                jQuery('#polljoy_pollview_close_btn').css('width',jQuery('#polljoy_pollview_close_btn').css('height'));
+                var padding = parseInt(jQuery('#polljoy_pollview_main').height() * 0.01875);
+                jQuery('#polljoy_pollview_close_btn').css('margin',padding+'px');
+            }
+            else {
+                jQuery('#polljoy_pollview_close_btn').css('height','5%');
+                jQuery('#polljoy_pollview_close_btn').css('width',jQuery('#polljoy_pollview_close_btn').css('height'));
+                var padding = parseInt(jQuery('#polljoy_pollview_main').height() * 0.025);
+                jQuery('#polljoy_pollview').css('margin',padding+'px');
+            }
+
+            // set close button location
+            methods.setCloseButtonLocation.apply(thisObject);
+
+            // poll image
+            if (orientation=='P') {
+                jQuery('.polljoy-pollview-thumbnail').css('height','21.88%');
+                jQuery('.polljoy-pollview-thumbnail').css('width',jQuery('.polljoy-pollview-thumbnail').css('height'));
+                var padding = parseInt($('#polljoy_pollview_main').height() * 0.0469);
+                jQuery('.polljoy-pollview-thumbnail').css('margin-top',padding+'px');
+                jQuery('.polljoy-pollview-thumbnail').css('margin-bottom','0');
+                jQuery('.polljoy-pollview-thumbnail').css('margin-left','auto');
+                jQuery('.polljoy-pollview-thumbnail').css('margin-right','auto');
+            }
+            else {
+                jQuery('.polljoy-pollview-thumbnail').css('height','29.167%');
+                jQuery('.polljoy-pollview-thumbnail').css('width',jQuery('.polljoy-pollview-thumbnail').css('height'));
+                var padding = parseInt($('#polljoy_pollview_main').height() * 0.05);
+                jQuery('.polljoy-pollview-thumbnail').css('margin',padding+'px');
+            }
+            
+            // question & answer
+            if (orientation=='L') {
+                jQuery('.polljoy-pollview-row-question-landscape').css('fontSize','1.2em');
+                jQuery('.polljoy-pollview-row-question-landscape').css('width',jQuery('#polljoy_pollview_main').width() - $('.polljoy-pollview-thumbnail-landscape').width() - parseInt($('.polljoy-pollview-thumbnail-landscape').css('margin-left')) * 3 +'px');
+                jQuery('.polljoy-pollview-row-question-landscape').css('margin-left',jQuery('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-row-question-landscape').css('margin-right',jQuery('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-answer-landscape').css('width',jQuery('#polljoy_pollview_main').width() - $('.polljoy-pollview-thumbnail-landscape').width() - parseInt($('.polljoy-pollview-thumbnail-landscape').css('margin-left')) * 3 +'px');
+                jQuery('.polljoy-pollview-answer-landscape').css('margin-left',jQuery('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-answer-landscape').css('margin-right',jQuery('.polljoy-pollview-thumbnail-landscape').css('margin-left'));
+                jQuery('.polljoy-pollview-answer-landscape').css('bottom',(parseInt(jQuery('.polljoy-pollview-thumbnail-landscape').css('margin-left'))/2)+'px');
+                jQuery('.polljoy-pollview-row-button-landscape').css('padding-bottom',jQuery('#polljoy_pollview_main').height() * 0.025);
+                jQuery('.polljoy-pollview-row-button-landscape').css('height','25.5%');
+                jQuery('#polljoy_pollview_row_openend').css('height','');
+                jQuery('#polljoy_pollview_row_thankyou').css('height','');
+                jQuery('#polljoy_pollview_openend_asnwer').css('height',jQuery('#polljoy_pollview_answer').height()*0.6374);
+            }
+            else {
+                jQuery('.polljoy-pollview-row-button-landscape').css('cssText','');
+                jQuery('.polljoy-pollview-thumbnail').removeClass('polljoy-pollview-thumbnail-landscape');
+                jQuery('.polljoy-pollview-row-question').removeClass('polljoy-pollview-row-question-landscape');
+                jQuery('.polljoy-pollview-answer').removeClass('polljoy-pollview-answer-landscape');
+                jQuery('.polljoy-pollview-row-button').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-reward').removeClass('polljoy-pollview-reward-landscape');
+                jQuery('.polljoy-pollview-row-openend').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-submit').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('.polljoy-pollview-row-collect').removeClass('polljoy-pollview-row-button-landscape');
+                jQuery('#polljoy_pollview_reward').css('bottom','');
+                jQuery('.polljoy-pollview-thumbnail').css('float','');
+                jQuery('#polljoy_pollview_question').css('cssText','');
+                jQuery('#polljoy_pollview_answer').css('cssText','');
+                jQuery('#polljoy_pollview_openend_asnwer').css('height',jQuery('#polljoy_pollview_answer').height()*0.6374);
+            }
+
+            // reward image
+            if (orientation=='P') {
+                var width=$('#polljoy_pollview_main').height() * 0.0313;
+                $('#polljoy_pollview_reward_image').css('width',width+'px');
+                $('#polljoy_pollview_reward_image').height($('#polljoy_pollview_reward_image').css('width'));
+                $('#polljoy_pollview_reward_image2').width($('#polljoy_pollview_reward_image').css('width'));
+                $('#polljoy_pollview_reward_image2').height($('#polljoy_pollview_reward_image').css('height'));
+                $('#polljoy_pollview_reward_earn').css('left',(width+2)+'px');
+            }
+            else {
+                var height=$('#polljoy_pollview_main').height()*.06
+                $('#polljoy_pollview_reward_image').css('width',height+'px');
+                $('#polljoy_pollview_reward_image').height($('#polljoy_pollview_reward_image').css('width'));
+                $('#polljoy_pollview_reward_image2').width($('#polljoy_pollview_reward_image').css('width'));
+                $('#polljoy_pollview_reward_image2').height($('#polljoy_pollview_reward_image').css('height'));
+                $('#polljoy_pollview_reward_earn').css('left',(height*1.2)+'px');
+            }
+            
+            // apply custom settings
+            jQuery('#polljoy_pollview_question_text').css('color','#' + app.fontColor);
+            jQuery('#polljoy_pollview_reward_earn').css('color','#' + app.fontColor);
+            jQuery('#polljoy_pollview_reward_earn2').css('color','#' + app.fontColor);
+            jQuery('.polljoy-pollview-btn').css('color','#' + app.buttonFontColor);
+
+            buttonImageUrl = orientation=='L'?app.buttonImageUrl_4x3_L:app.buttonImageUrl_4x3_P;
+
+            if (buttonImageUrl.length > 0) {
+                jQuery('.polljoy-pollview-btn').css('background-image','url("' + buttonImageUrl +'")');
+                jQuery('.polljoy-pollview-btn').css('background-color','transparent');
+                jQuery('.polljoy-pollview-btn').css('box-shadow','');
+            }
+            else {
+                jQuery('.polljoy-pollview-btn').css('background','#' + app.buttonColor);
+                if (app.buttonShadow==1)
+                    $('.polljoy-pollview-btn').css('box-shadow','2px 2px #9E9E9E');
+                else
+                    $('.polljoy-pollview-btn').css('box-shadow','');
+            }
+
+            // background & border
+            jQuery('#polljoy_pollview_background').css('background','#'+app.backgroundColor);
+            jQuery('#polljoy_pollview_background').css('opacity', app.backgroundAlpha/100);
+            jQuery('#polljoy_pollview_background').css('filter:', "alpha(opacity=" + app.backgroundAlpha +")");
+            jQuery('#polljoy_pollview_background').css('border-radius',app.backgroundCornerRadius + 'px' );
+            jQuery('#polljoy_pollview_background').css('border-color', '#' + app.borderColor);
+            var frameWidth=jQuery('#polljoy_pollview_main').width()+(2*parseInt(app.borderWidth));
+            var frameHeight=jQuery('#polljoy_pollview_main').height()+(2*parseInt(app.borderWidth));
+            var borderWidth=parseInt(app.borderWidth)+'px';
+            jQuery('#polljoy_pollview_background').css('min-width',frameWidth+'px');
+            jQuery('#polljoy_pollview_background').css('min-height',frameHeight+'px');
+            jQuery('#polljoy_pollview_background').css('border-width',borderWidth + ' ' + borderWidth + ' ' + borderWidth + ' ' + borderWidth + ' ');
+
+            var canvasImage = orientation=='L'?app.borderImageUrl_4x3_L:app.borderImageUrl_4x3_P;
+            if ((canvasImage !== null) && (canvasImage.length > 0)) {
+                jQuery('#polljoy_pollview_border_canvas').css('background-image', 'url("'+ canvasImage + '")');
+            }
+            jQuery('#polljoy_pollview_border_canvas').css('opacity', app.backgroundAlpha/100);
+            jQuery('#polljoy_pollview_border_canvas').css('filter:', "alpha(opacity=" + app.backgroundAlpha +")");
+
+            jQuery('#polljoy_pollview_main').css('border-radius',app.backgroundCornerRadius + 'px' );
+
+            // overlay
+            jQuery('#polljoy_pollview_overlay_canvas').css('background-color', (app.overlayAlpha==100?'':'#FFF'));
+            jQuery('#polljoy_pollview_overlay_canvas').css('opacity', app.overlayAlpha/100);
+            jQuery('#polljoy_pollview_overlay_canvas').css('filter:', "alpha(opacity=" + app.overlayAlpha +")");
+
+            methods.centerThePoll();
+        },
+        adjustLayoutSize: function()
+        {
+            var minWidth =window.innerWidth;
+            var minHeight = window.innerHeight;
+            var newFontSize = 32;
+            var newWidth = minWidth;
+            var newHeight = minHeight;
+
+            if (newHeight > newWidth) {
+                orientation = 'P';
+                do {
+                    newWidth = newWidth * 0.99;
+                    newHeight = newWidth * (4/3);
+                } while ((newHeight > minHeight) || (newWidth > minWidth));
+
+                newFontSize = newFontSize * (newHeight / 600) * 0.8;
+            }
+            else {
+                orientation = 'L';
+                do {
+                    newHeight = newHeight * 0.99;
+                    newWidth = newHeight * (4/3);
+                } while ((newHeight > minHeight) || (newWidth > minWidth));
+
+                newFontSize = newFontSize * (newHeight / 600);
+            }
+
+            jQuery('.pollContainer').css('width',newWidth).css('height',newHeight).css('font-size',newFontSize+'px');
+
+        },
+        bindEvents: function()
+        {
+            $(window).resize(function() {
+                methods.adjustLayoutSize.apply(thisObject);
+                methods.switchOrientation.apply(thisObject);
+                methods.layoutView.apply(thisObject);
+                methods.setButtonSize.apply(thisObject);
+            });
+
+            $(window).bind('orientationchange', function() {
+                methods.adjustLayoutSize.apply(thisObject);
+                methods.switchOrientation.apply(thisObject);
+                methods.layoutView.apply(thisObject);
+                methods.setButtonSize.apply(thisObject);
+            });
+
+            timer = setInterval(function() {
+                methods.centerThePoll();
+            }, 100);
+        },
+        unbindEvents: function()
+        {
+            $(window).unbind('resize');
+            $(window).unbind('orientationchange');
+            clearInterval(timer); 
         }
     };
 
@@ -474,25 +878,27 @@
             $.error('Method ' + method + ' does not exist on jQuery.polljoy');
         }
     };
+
 })(jQuery);
 
 function polljoy(method)
 {
-    var div = jQuery('#poll');
+    var div = jQuery('#polljoy_poll');
     if (div.length === 0)
     {
-        jQuery('body').append('<div id="poll"></div>');
+        var cssLink='<link rel="stylesheet" type="text/css" href="https://res.polljoy.com/css/PJPollview.css">';
+        jQuery('head').append(cssLink);
+        jQuery('body').append('<div id="polljoy_poll"></div>');
     }
 
-    jQuery('#poll')
+    jQuery('#polljoy_poll')
             .css('position', 'fixed')
             .css('width', '100%')
             .css('height', '100%')
             .css('top', '0')
             .css('left', '0')
             .css('display', 'none')
-            .css('z-index', '1000')
-            .css('background', 'rgba(32,32,32,0.7)')
-    jQuery('#poll').polljoy(method);
+            .css('z-index', '1000');
+    jQuery('#polljoy_poll').polljoy(method);
 
 }

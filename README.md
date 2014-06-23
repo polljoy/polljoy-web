@@ -248,6 +248,9 @@ note: The API will regularly update to open more data. Please always check the r
 
 ## Version History
 
+### Version 1.1.1-BETA
+- UI improvement for desktop
+
 ### Version 1.1-BETA
 - Pre-release for new UI custom settings & features.
 - Currently available in SANDBOX only (not for production)

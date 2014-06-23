@@ -61,7 +61,7 @@ After you installed the PHP file in your server end and include the Javascript f
 <script type="text/javascript">
     jQuery(document).ready(function()
     {
-        polljoy({
+        jQuery('#poll').polljoy({
             endPoint: 'URL/TO/YOUR/SERVER/END/connect.php'
         });
     });  
@@ -247,9 +247,6 @@ note: The API will regularly update to open more data. Please always check the r
 #### Got questions? Email us at help@polljoy.com
 
 ## Version History
-
-### Version 1.1.1-BETA
-- UI improvement for desktop
 
 ### Version 1.1-BETA
 - Pre-release for new UI custom settings & features.

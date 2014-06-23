@@ -817,36 +817,23 @@
             var newWidth = minWidth;
             var newHeight = minHeight;
 
-            if (screen && (screen.width > 980) && (minWidth >= 800) ) {
+            if (newHeight > newWidth) {
+                orientation = 'P';
+                do {
+                    newWidth = newWidth * 0.99;
+                    newHeight = newWidth * (4/3);
+                } while ((newHeight > minHeight) || (newWidth > minWidth));
+
+                newFontSize = newFontSize * (newHeight / 600) * 0.8;
+            }
+            else {
                 orientation = 'L';
-                newHeight  = 600;
-                newWidth = 800;
                 do {
                     newHeight = newHeight * 0.99;
                     newWidth = newHeight * (4/3);
                 } while ((newHeight > minHeight) || (newWidth > minWidth));
 
                 newFontSize = newFontSize * (newHeight / 600);
-            }
-            else {
-                if (newHeight > newWidth) {
-                    orientation = 'P';
-                    do {
-                        newWidth = newWidth * 0.99;
-                        newHeight = newWidth * (4/3);
-                    } while ((newHeight > minHeight) || (newWidth > minWidth));
-
-                    newFontSize = newFontSize * (newHeight / 600) * 0.8;
-                }
-                else {
-                    orientation = 'L';
-                    do {
-                        newHeight = newHeight * 0.99;
-                        newWidth = newHeight * (4/3);
-                    } while ((newHeight > minHeight) || (newWidth > minWidth));
-
-                    newFontSize = newFontSize * (newHeight / 600);
-                }
             }
 
             jQuery('.pollContainer').css('width',newWidth).css('height',newHeight).css('font-size',newFontSize+'px');

@@ -9,8 +9,8 @@ $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 /* unset($_SESSION); */
 
 session_start();
-//$backend = 'https://api.polljoy.com/poll/';
-$backend = 'http://apisandbox.polljoy.com/poll/';
+$backend = 'https://api.polljoy.com/poll/';
+//$backend = 'http://apisandbox.polljoy.com/poll/';
 header('Access-Control-Allow-Origin: *');
 
 function getDevice() {

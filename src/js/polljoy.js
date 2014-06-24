@@ -1,3 +1,4 @@
+// version 1.2, production release
 (function($) {
     var connector = '';
     var background = '';

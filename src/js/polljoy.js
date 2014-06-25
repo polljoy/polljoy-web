@@ -1,4 +1,3 @@
-// version 1.2, production release
 (function($) {
     var connector = '';
     var background = '';
@@ -768,7 +767,7 @@
 
             buttonImageUrl = orientation=='L'?app.buttonImageUrl_4x3_L:app.buttonImageUrl_4x3_P;
 
-            if (buttonImageUrl.length > 0) {
+            if ((buttonImageUrl !== null) && (buttonImageUrl.length > 0)) {
                 jQuery('.polljoy-pollview-btn').css('background-image','url("' + buttonImageUrl +'")');
                 jQuery('.polljoy-pollview-btn').css('background-color','transparent');
                 jQuery('.polljoy-pollview-btn').css('box-shadow','');

@@ -1,4 +1,18 @@
-(function($) {
+(function (polljoyFactory) {
+    /* If the project supports AMD (Asynchronous Module Definition), */
+    /* define the polljoy into module. */
+    /* If not, populate the polljoy function to the window object. */
+    if (typeof define === 'function' && define.amd)
+    {
+        define(['jquery'], polljoyFactory);
+    }
+    else
+    {
+        window.polljoy = polljoyFactory(jQuery);
+    }
+})(function(jQuery) {
+    var $ = jQuery; // Dependency Injection
+
     var connector = '';
     var background = '';
     var border = '';
@@ -892,26 +906,27 @@
         }
     };
 
-})(jQuery);
-
-function polljoy(method)
-{
-    var div = jQuery('#polljoy_poll');
-    if (div.length === 0)
+    /* Return the function and then it will be defined as module or populated to the window object. */
+    return function(method)
     {
-        var cssLink='<link rel="stylesheet" type="text/css" href="https://res.polljoy.com/css/PJPollview.css">';
-        jQuery('head').append(cssLink);
-        jQuery('body').append('<div id="polljoy_poll"></div>');
+        var div = jQuery('#polljoy_poll');
+        if (div.length === 0)
+        {
+            var cssLink='<link rel="stylesheet" type="text/css" href="https://res.polljoy.com/css/PJPollview.css">';
+            jQuery('head').append(cssLink);
+            jQuery('body').append('<div id="polljoy_poll"></div>');
+        }
+
+        jQuery('#polljoy_poll')
+                .css('position', 'fixed')
+                .css('width', '100%')
+                .css('height', '100%')
+                .css('top', '0')
+                .css('left', '0')
+                .css('display', 'none')
+                .css('z-index', '1000');
+        jQuery('#polljoy_poll').polljoy(method);
+
     }
 
-    jQuery('#polljoy_poll')
-            .css('position', 'fixed')
-            .css('width', '100%')
-            .css('height', '100%')
-            .css('top', '0')
-            .css('left', '0')
-            .css('display', 'none')
-            .css('z-index', '1000');
-    jQuery('#polljoy_poll').polljoy(method);
-
-}
+});

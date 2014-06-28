@@ -1,3 +1,12 @@
+var PJPollIsReady;
+var PJPollNotAvailable;
+var PJPollWillShow;
+var PJPollDidShow;
+var PJPollWillDismiss;
+var PJPollDidDismiss;
+var PJPollDidResponded;
+var PJPollDidSkipped;
+
 (function (polljoyFactory) {
     /* If the project supports AMD (Asynchronous Module Definition), */
     /* define the polljoy into module. */

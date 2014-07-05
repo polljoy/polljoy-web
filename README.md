@@ -267,7 +267,7 @@ For a really simple example. If you have the button somewhere on your website
 You can use the following javascript to get the poll, and it handles the basic callback functions.
 
 
- ``` javascript
+ ``` html
 <script type="text/javascript">
 	function PJPollIsReady(polls)
     {
@@ -310,6 +310,7 @@ You can use the following javascript to get the poll, and it handles the basic c
             endPoint: 'connect.php',
             deviceId: "browser"+Math.floor((Math.random() * 1000) + 1)
         });
+        
         $("#getpoll").click(function(){
         	polljoy('show');
         });

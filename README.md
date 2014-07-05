@@ -73,7 +73,7 @@ This is the simplest way to connect your webapp to the server end and start sess
 You can pass more selection criteria that match your poll settings in [admin panel](https://admin.polljoy.com). It looks like:
 
 ``` html
-<javascript>
+<script type="text/javascript">
 	 jQuery(document).ready(function()
             {
                 polljoy({
@@ -141,8 +141,23 @@ Status can be:
  ```
  
  This will present the polljoy UI according to your app color and poll settings. Then polljoy plugin will handle all the remaining tasks for you. These include handling the user's response, informing delegate for any virtual amount user received, upload result to polljoy service ... etc.
+
+For example, the following code snippets will load the poll for the app once it is ready: 
  
- We highly recommend you implement this callback function so that you know polls are ready and call polljoy plugin to show the poll or do whatever control you need.
+  
+ ``` javascript
+function PJPollIsReady(polls)
+{
+	console.log("poll is ready");
+	polljoy('show');
+}
+ ```
+ 
+  
+We highly recommend you implement the above callback function so that you know polls are ready and call polljoy plugin to show the poll or do whatever control you need.
+ 
+ 
+ 
  
  ``` javascript
  function PJPollWillShow(poll);

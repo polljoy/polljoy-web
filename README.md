@@ -325,6 +325,9 @@ You can use the following javascript to get the poll, and it handles the basic c
 
 ## Version History
 
+### Version 1.2.2
+- UI update
+
 ### Version 1.2.1
 - Add var for callbacks to handle different callbacks implementation scenario
 

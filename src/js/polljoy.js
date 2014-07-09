@@ -69,66 +69,65 @@ var PJPollDidSkipped;
         },
         initPoll: function()
         {
-            var registerSesson = $.ajax({
+            var registerSession = $.ajax({
                 url: connector + '?register=true',
                 type: 'post',
-                async: false,
                 dataType: 'json',
                 data: {deviceId: deviceId}
-            }).responseText;
+            });
 
-            var response = $.parseJSON(registerSesson);
-            if (response.status === 1)
-            {
-                console.log('registerSession.json returned error!');
-                return false;
-            }
-
-            app = response.app;
-
-            background = response.app.backgroundColor;
-            border = response.app.borderColor;
-            font = response.app.fontColor;
-            buttonColor = response.app.buttonColor;
-
-            sessionId = response.app.sessionId;
-            /*now get the polls for this app*/
-            /*url: connector + 'smartget.json',*/
-            var smartget = $.ajax({
-                url: connector + '?sg=true',
-                type: 'post',
-                async: false,
-                dataType: 'json',
-                data: {
-                    sessionId: sessionId,
-                    userType: userType,
-                    appVersion: appVersion,
-                    level: level,
-                    sessionCount: sessionCount,
-                    timeSinceInstall: timeSinceInstall,
-                    tags: tags,
-                    deviceId: deviceId
-                }
-            }).responseText;
-
-            var sgResponse = $.parseJSON(smartget);
-
-            polls = sgResponse.polls;
-
-            if (typeof polls !== 'undefined' && polls.length > 0)
-            {
-                if (typeof PJPollIsReady === 'function')
+            registerSession.done(function(response){ 
+                if (response.status === 1)
                 {
-                    PJPollIsReady(polls);
+                    console.log('registerSession.json returned error!');
+                    return false;
                 }
-            }
-            else
-            {
-                if (typeof PJPollNotAvailable === 'function')
-                {
-                    PJPollNotAvailable(sgResponse.status);
+                else {
+                    app = response.app;
+
+                    background = response.app.backgroundColor;
+                    border = response.app.borderColor;
+                    font = response.app.fontColor;
+                    buttonColor = response.app.buttonColor;
+
+                    sessionId = response.app.sessionId;
+
+                    /*now get the polls for this app*/
+                    /*url: connector + 'smartget.json',*/
+                    var smartget = $.ajax({
+                        url: connector + '?sg=true',
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            sessionId: sessionId,
+                            userType: userType,
+                            appVersion: appVersion,
+                            level: level,
+                            sessionCount: sessionCount,
+                            timeSinceInstall: timeSinceInstall,
+                            tags: tags,
+                            deviceId: deviceId
+                        }
+                    });
+                    smartget.done(function(sgResponse){
+                        polls = sgResponse.polls;
+                        if (typeof polls !== 'undefined' && polls.length > 0)
+                        {
+                            if (typeof PJPollIsReady === 'function')
+                            {
+                                PJPollIsReady(polls);
+                            }
+                        }
+                        else
+                        {
+                            if (typeof PJPollNotAvailable === 'function')
+                            {
+                                PJPollNotAvailable(sgResponse.status);
+                            }
+                        }
+                    });
                 }
-            }
+            });
         },
         show: function()
         {
@@ -321,6 +320,7 @@ var PJPollDidSkipped;
 
             if (!poll.mandatory)
             {
+                jQuery('#polljoy_pollview_close_btn').show();
                 if ((poll.app.closeButtonImageUrl !== null) && (poll.app.closeButtonImageUrl.length > 0)) {
                     jQuery('#polljoy_pollview_close_btn').css('background-image','url("'+poll.app.closeButtonImageUrl+'")');
                     jQuery('#polljoy_pollview_close_btn').css('color','transparent');
@@ -363,6 +363,9 @@ var PJPollDidSkipped;
                             PJPollDidSkipped(poll);
                         }
                     });
+            }
+            else {
+                jQuery('#polljoy_pollview_close_btn').hide();
             }
 
             var reward = parseInt(poll.virtualAmount);
@@ -842,8 +845,8 @@ var PJPollDidSkipped;
 
             if (screen && (screen.width > 980) && (minWidth >= 800) ) {
                 orientation = 'L';
-                newHeight  = 450;
-                newWidth = 600;
+                newHeight  = 600;
+                newWidth = 800;
                 do {
                     newHeight = newHeight * 0.99;
                     newWidth = newHeight * (4/3);

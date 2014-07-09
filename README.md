@@ -259,71 +259,17 @@ note: The API will regularly update to open more data. Please always check the r
 
 
 ### Simple example
-
-For a really simple example. If you have the button somewhere on your website
-``` html
-<button type="button"  id="getpoll" style="display:block" disabled>Show poll</button>
-```
-You can use the following javascript to get the poll, and it handles the basic callback functions.
-
-
- ``` html
-<script type="text/javascript">
-	function PJPollIsReady(polls)
-    {
-        console.log("poll is ready");
-        $("#getpoll").removeAttr("disabled");
-    }
-    function PJPollNotAvailable(status){
-    	console.log("PJPollNotAvailable : " + status);
-    	$("#getpoll").attr("disabled", true);
-    }
-    function PJPollWillShow(poll)
-    {
-    	console.log("PJPollWillShow: ");
-    	console.log(poll);
-    }
-    function PJPollWillDismiss(poll)
-    {
-    	console.log("PJPollWillDismiss: ");
-    	console.log(poll);
-    }
-    function PJPollDidDismiss(poll)
-    {
-    	console.log("PJPollDidDismiss: ");
-    	console.log(poll);
-    }
-    function PJPollDidResponded(poll){
-    	console.log("PJPollDidResponded: ");
-    	console.log("User selected: " + poll.response);
-    }
-    function PJPollDidSkipped(poll)
-    {
-    	console.log("PJPollDidSkipped: ");
-    	console.log(poll);
-    }
-
-    jQuery(document).ready(function()
-    {
-
-	polljoy({
-            endPoint: 'connect.php',
-            deviceId: "browser"+Math.floor((Math.random() * 1000) + 1)
-        });
-        
-        $("#getpoll").click(function(){
-        	polljoy('show');
-        });
-
-    });  
-</script>
- ```
+Please see the example folder in the SDK for an simple integratoin. 
 
 
 -
 #### Got questions? Email us at help@polljoy.com
 
 ## Version History
+
+###Version 1.2.3
+- Minor bug fixes
+- Add integratoin example
 
 ### Version 1.2.2
 - UI update

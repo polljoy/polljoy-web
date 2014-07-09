@@ -2,7 +2,7 @@
 
 /* Please update with YOUR_APP_ID that available it admin panel */
 
-$appId = 'YOUR_APP_ID';
+$appId = 'Please put your APP_ID here';
 $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 
 /* * *Don't modify below this line*** */

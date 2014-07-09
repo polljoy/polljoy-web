@@ -259,7 +259,7 @@ note: The API will regularly update to open more data. Please always check the r
 
 
 ### Simple example
-Please see the example folder in the SDK for an simple integratoin. 
+Please see the example folder in the SDK for a simple integration. 
 
 
 -
@@ -269,7 +269,7 @@ Please see the example folder in the SDK for an simple integratoin.
 
 ###Version 1.2.3
 - Minor bug fixes
-- Add integratoin example
+- Add integration example
 
 ### Version 1.2.2
 - UI update

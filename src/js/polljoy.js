@@ -91,6 +91,7 @@ var PJPollDidSkipped;
                     buttonColor = response.app.buttonColor;
 
                     sessionId = response.app.sessionId;
+                    deviceId = response.app.deviceId;
 
                     /*now get the polls for this app*/
                     /*url: connector + 'smartget.json',*/

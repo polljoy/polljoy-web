@@ -267,7 +267,10 @@ Please see the example folder in the SDK for a simple integration.
 
 ## Version History
 
-###Version 1.2.3
+### Version 1.2.4
+- fix deviceId issue in different implementation scenario
+
+### Version 1.2.3
 - Minor bug fixes
 - Add integration example
 

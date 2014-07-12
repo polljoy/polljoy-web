@@ -38,7 +38,7 @@ src\js\polljoy.js
 
 NOTE: If you need more secure control, you should store `connect.php` in a controlled area that can only be accessed after user login.
 
-2. Edit `connect.php` to add your **App ID** and save
+2. Edit `connect.php` to add your **App ID** (they are available in the web [admin panel](https://admin.polljoy.com/applications/app), and save
 
 ``` php
 $appId = 'YOUR_APP_ID';

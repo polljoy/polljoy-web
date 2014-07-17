@@ -84,7 +84,7 @@ You can pass more selection criteria that match your poll settings in [admin pan
                     level: 'LEVEL',
                     sessionCount: 'SESSION_COUNT',
                     timeSinceInstall: 'TIME_SINCE_INSTALL',
-                    tags: 'MALE,AGE#18'
+                    tags: 'TAGNAME,TAGNAME#RANGE'
                 });
             });
 </script>
@@ -104,8 +104,7 @@ All the parameters are optional. You can use these parameters to select the spec
 
 `TIME_SINCE_INSTALL` - if your app tracks how long your users have been using your app, you can pass this to select the right poll.
 
-`MALE,AGE#18` - if you app uses tags to select polls, you pass the tags here. Please remember this needs to match your settings in admin panel.
-For example, if you want to ask the specific question to male users that just turned adults, you can put the tag like this. 
+`TAGNAME,TAGNAME#RANGE` - if you app uses tags to select polls, you pass the tags here. Please remember this needs to match your settings in admin panel. For example, if you want to ask the specific question to male users that just turned adults, you can put the tag like this: `MALE,AGE#18` 
 
 ### Handle callbacks from plug-in (optional)
 

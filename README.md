@@ -84,26 +84,28 @@ You can pass more selection criteria that match your poll settings in [admin pan
                     level: 'LEVEL',
                     sessionCount: 'SESSION_COUNT',
                     timeSinceInstall: 'TIME_SINCE_INSTALL',
-                    tags: 'TAGS,TAGS#1-123'
+                    tags: 'MALE,AGE#18'
                 });
             });
 </script>
 ```
 
-All the parameters are optional.
+All the parameters are optional. You can use these parameters to select the specific target users to answer your polls
 
 `DEVICE_ID` - your can pass your user's id, email or whatever unique key to identify your user. If you webapp is running on mobile, it can be the mobile UUID. Your don't can skip this, plug-in will automatically create one for your from the HTTP AGENT and IP Address
 
-`USER_TYPE` - your app user type either **Pay** or **Non-Pay**.
+`USER_TYPE` - select either **Pay** or **Non-Pay** users of your app.
+
 `APP_VERSION` - your app's version to be used as a poll selection criteria. This should match with your poll setting. Or set it as nil if you are not using.
 
-`LEVEL` - if your app is a game app, this is your game level. This should match with your poll setting. Or set it as 0 if you are not using.
+`LEVEL` - if your app is a game, this is your game level. This should match with your poll setting. Or set it as 0 if you are not using.
 
 `SESSION_COUNT` - if you have session control, you can pass this to match with your poll setting to get the correct poll for your user.
 
-`TIME_SINCE_INSTALL` - if your app track how long your users have been using your app, you can pass this to select the right poll.
+`TIME_SINCE_INSTALL` - if your app tracks how long your users have been using your app, you can pass this to select the right poll.
 
-`TAGS,TAGS#1-123` - if you app use tags to select polls, you pass the tags here. Please remember this needs to match your settings in admin panel.
+`MALE,AGE#18` - if you app uses tags to select polls, you pass the tags here. Please remember this needs to match your settings in admin panel.
+For example, if you want to ask the specific question to male users that just turned adults, you can put the tag like this. 
 
 ### Handle callbacks from plug-in (optional)
 

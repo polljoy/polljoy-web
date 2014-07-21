@@ -2,7 +2,7 @@
 
 ### Version 1.2.5
 - UI Improvement
-- 
+
 ### Version 1.2.4
 - fix deviceId issue in different implementation scenario
 

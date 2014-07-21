@@ -844,10 +844,10 @@ var PJPollDidSkipped;
             var newWidth = minWidth;
             var newHeight = minHeight;
 
-            if (screen && (screen.width > 980) && (minWidth >= 800) ) {
+            if (screen && (screen.width > 980) && (minWidth >= 600) ) {
                 orientation = 'L';
-                newHeight  = 600;
-                newWidth = 800;
+                newHeight  = 450;
+                newWidth = 600;
                 do {
                     newHeight = newHeight * 0.99;
                     newWidth = newHeight * (4/3);

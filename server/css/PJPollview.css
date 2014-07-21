@@ -1,0 +1,445 @@
+.polljoy-pollview-size {
+    display: block;
+    position: relative;
+    color: #000000;
+    font-size: 24px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    margin: auto;
+}
+
+.polljoy-pollview-overlay-canvas {
+    position: fixed;
+    overflow:hidden;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.polljoy-pollview-border-canvas {
+    position: absolute;
+    top: 0px;
+    overflow:hidden;
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+}
+.polljoy-pollview-border {
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border-color: transparent;
+    border-width: 0;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.polljoy-pollview-size-3x2-portrait {
+    width: 240px;
+    height: 360px;
+}
+
+.polljoy-pollview-size-4x3-portrait {
+    width: 256px;
+    height: 341px;
+}
+
+.polljoy-pollview-size-16x9-portrait {
+    width: 240px;
+    height: 426px;
+}
+
+.polljoy-pollview-size-web-portrait {
+    width: 480px;
+    height: 640px;
+}
+
+.polljoy-pollview-size-3x2-landscape {
+    width: 341px;
+    height: 227px;
+}
+
+.polljoy-pollview-size-4x3-landscape {
+    width: 341px;
+    height: 256px;
+}
+
+.polljoy-pollview-size-16x9-landscape {
+    width: 341px;
+    height: 192px;
+}
+.polljoy-pollview-size-web-landscape {
+    width: 600px;
+    height: 450px;
+}
+.polljoy-pollview-size-mobile-landscape {
+    width: 341px;
+    height: 192px;
+}
+
+.polljoy-pollview-inner-3x2-portrait {
+    width: 75% !important;
+    height: 72.92% !important;
+    font-size: 85% !important;
+}
+
+.polljoy-pollview-inner-4x3-portrait {
+    width: 72.9% !important;
+    height: 73.24% !important;
+    font-size: 70% !important;
+}
+
+.polljoy-pollview-inner-web-portrait {
+    width: 72.9% !important;
+    height: 73.24% !important;
+    font-size: 70% !important;
+}
+
+.polljoy-pollview-inner-16x9-portrait {
+    width: 75% !important;
+    height: 78.125% !important;
+    font-size: 85% !important;
+}
+
+.polljoy-pollview-inner-3x2-landscape {
+    height: 62.5% !important;
+    width: 81.25% !important;
+    font-size: 65% !important;
+}
+
+.polljoy-pollview-inner-4x3-landscape {
+    height: 72.92% !important;
+    width: 73.25% !important;
+    font-size: 70% !important;
+}
+
+.polljoy-pollview-inner-16x9-landscape {
+    height: 75% !important;
+    width: 78.125% !important;
+    font-size: 65% !important;
+}
+
+.polljoy-pollview-inner-web-landscape {
+    height: 72.92% !important;
+    width: 73.25% !important;
+    font-size: 65% !important;
+}
+
+.polljoy-pollview {
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: transparent;
+    color: #000000;
+
+}
+
+.polljoy-pollview-thumbnail-landscape {
+    float: left !important;
+}
+
+.polljoy-pollview-background{
+    margin: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: #FFFFFF;
+    border-color: #000000;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 7px;
+    border-style: solid;
+}
+
+.polljoy-pollview-thumbnail-pollview {
+    background-color: transparent;
+    border-width: 0;
+    width: 100%;
+    height: 100%;
+}
+.polljoy-pollview-thumbnail {
+    display: block;
+    height: 21.88%;
+    max-width: 38.88%;
+    background-color: transparent;
+}
+
+.polljoy-pollview-reward{
+    display: table;
+    margin-top: 15%;
+    margin-left: 3%;
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    color: #000000;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    font-size: inherit;
+    width: 30%;
+}
+
+.polljoy-pollview-reward-landscape {
+    bottom: 50px !important;
+    margin-top: auto;
+    font-size: inherit;
+    width: 16.67%;
+}
+
+.polljoy-pollview-reward-image{
+    display: table-cell;
+    margin: auto;
+    bottom: 0px;
+    left: 0;
+    position: absolute;
+    float: left;
+    color: #000000;
+    font-size: 10px;
+    width: 23.33%;
+    height: auto;
+    background-size: 100% 100%;
+    background-image: url("https://res.polljoy.com/img/reward.png");
+    background-repeat: no-repeat;
+}
+
+.polljoy-pollview-reward-earn{
+    display: table-cell;
+    margin-top: 0px;
+    margin-right: 0px;
+    top: 0px;
+    left: 15px;
+    position: relative;
+    float: left;
+    color: #000000;
+    line-height: 100%;
+}
+
+.polljoy-pollview-reward-earn-text{
+
+}
+
+.polljoy-pollview-reward-earn-amount{
+
+}
+
+.polljoy-pollview-virtual-amount-bg{
+    display: block;
+    position: absolute;
+    float: right;
+    top: 40px;
+    right: 20px;
+    height: 90px;
+    width: 90px;
+    background-size: 90px 90px;
+}
+.polljoy-pollview-virtual-amount{
+    color: #000000;
+    margin-top: 5px;
+    font-size: large;
+}
+
+.polljoy-pollview-row-question {
+    height: 18.44%;
+    display: table;
+    width: 88.89%;
+/*    margin-top: 2.34%;
+    margin-bottom: 2.34%;*/
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-question {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    line-height: 120%;
+}
+
+.polljoy-pollview-row-question-landscape {
+    height: 29.167% !important;
+    position: absolute;
+    margin-bottom: 0;
+    margin-top: 3.125%;
+    right: 0%;
+    margin-left: 3.125%;
+    margin-right: 3.125%;
+}
+
+.polljoy-pollview-question-question {
+    text-align: center;
+}
+
+.polljoy-pollview-answer {
+    position: absolute;
+    min-width: 100%;
+    bottom: 0;
+    height: 55%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-answer-landscape {
+    min-width: 66.875% !important;
+    height: 63.33% !important;
+    right: 0% !important;
+    bottom: 1.5625%;
+}
+
+.polljoy-pollview-mc-choices {
+    display: table;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.polljoy-pollview-row-button {
+    width: 88.89%;
+    padding-bottom: 5.6867%;
+    height: 25%;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-row-button-landscape {
+    width: 100% !important;
+}
+.polljoy-pollview-btn {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    border-radius: 4px;
+    color: #000000;
+    width:100%;
+    height: 100%;
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #d3d3d3;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    white-space: pre-wrap;      /* CSS3 */
+    white-space: -moz-pre-wrap; /* Firefox */
+    white-space: -pre-wrap;     /* Opera <7 */
+    white-space: -o-pre-wrap;   /* Opera 7 */
+    word-wrap: break-word;      /* IE */
+    height: 26%;
+    overflow: hidden;
+}
+
+.polljoy-pollview-openend {
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.polljoy-pollview-row-openend{
+    width: 88.89%;
+    padding-bottom: 3.13%;
+    height: 70%;
+    display: table;
+    margin-bottom: 3.13%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-openend-answer
+{
+    padding: 0px;
+    margin: 0px;
+    color: #000000;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+}
+
+.polljoy-pollview-row-submit{
+    width: 88.89%;
+    padding-bottom: 5.6867%;
+    height: 25%;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-thankyou {
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.polljoy-pollview-row-thankyou{
+    width: 88.89%;
+    padding-bottom: 3%;
+    height: 70%;
+    display: table;
+    margin-bottom: 3%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-thankyou-reward
+{
+    height: 100%;
+    display: table;
+    vertical-align: middle;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-row-collect{
+    width: 88.89%;
+    padding-bottom: 5.6867%;
+    height: 25%;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polljoy-pollview-thankyou-image{
+    display: table-cell;
+    vertical-align: middle;
+    color: #000000;
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+    background-size: 100%;
+    background-image: url("https://res.polljoy.com/img/reward.png");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.polljoy-pollview-thankyou-earn{
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 5px;
+}
+
+.polljoy-pollview-thankyou-earn-amount{
+
+}
+
+.polljoy-pollview-close-btn {
+    position: absolute;
+    background-size: 100% 100%;
+    font-size: 100%;
+    cursor: pointer;
+    z-index: 1;
+}

@@ -1,4 +1,4 @@
-![Picture](http://www.polljoy.com/assets/images/logo/logo.png)
+![Picture](http://www.polljoy.com/assets/images/logo/polljoy-logo.png)
 
 > In-app polls made easy. Integrate in 2 lines of code.
 
@@ -265,32 +265,3 @@ Please see the example folder in the SDK for a simple integration.
 
 -
 #### Got questions? Email us at help@polljoy.com
-
-## Version History
-
-### Version 1.2.4
-- fix deviceId issue in different implementation scenario
-
-### Version 1.2.3
-- Minor bug fixes
-- Add integration example
-
-### Version 1.2.2
-- UI update
-
-### Version 1.2.1
-- Add var for callbacks to handle different callbacks implementation scenario
-
-### Version 1.2
-- Production release
-
-### Version 1.1.1-BETA
-- UI improvement for desktop
-
-### Version 1.1-BETA
-- Pre-release for new UI custom settings & features.
-- Currently available in SANDBOX only (not for production)
-- Please contact help@polljoy.com if you want to beta test
-
-### Version 0.1
-- Initial beta release

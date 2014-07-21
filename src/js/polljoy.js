@@ -639,6 +639,7 @@ var PJPollDidSkipped;
             }
 
             jQuery('#polljoy_pollview_close_btn').css('font-size',jQuery('#polljoy_pollview_close_btn').width()+'px');
+            jQuery('#polljoy_pollview_close_btn').css('line-height',jQuery('#polljoy_pollview_close_btn').width()+'px');
         },
         switchOrientation: function()
         {

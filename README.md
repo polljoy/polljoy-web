@@ -1,35 +1,22 @@
 ![Picture](http://www.polljoy.com/assets/images/logo/polljoy-logo-github.png)
 
-> In-app polls made easy. Integrate in 2 lines of code.
+In-app polls made easy. Just 2 API calls.
 
 
-#Polljoy Web app Integration Guide
+#Intro
+Hi friend! Let's add polljoy to your wondeful website or mobile web app. 
 
-Welcome friend! This guide will get you started with polljoy, fast & easy.
+It's simple, you'll be up in minutes. 
 
-Got questions?  Email us at help@polljoy.com
+Questions? - email help@polljoy.com and one of our devs will assist!
 
--
+#Web console
+Polls are created and managed through our web interface - https://admin.polljoy.com
 
-<b>Simple</b> - polljoy is designed to be simple for users and especially developers. Just 2 API calls, you can get your polls running.
+Please note - polljoy web plug-in requires **JQuery** 1.6 or later  and **PHP** with **curl mod** enabled at your server end.
 
-<b>Open</b> - The polljoy API is open. The SDK comes with all source code and a test app. You can simply install the SDK as-is to integrate the polljoy service.
-
-<b>Easy</b> - polljoy is easy to use. Check out the test App in the SDK. Test with your own user id and app id. You can see how polljoy works. 
-
-<b>Flexible</b> - the polljoy SDK comes with the required UI to present the poll and do all the tasks for you. But if you want to implement your own UI, you can. The poll data is open. Enjoy!
-
-
-# The polljoy Admin Console
-
-You can setup and manage all your polls through a web interface here https://admin.polljoy.com
-
-NOTE: Please note - PollJoy web plug-in requires **JQuery** 1.6 or later  and **PHP** with **curl mod** enabled at your server end.
-
-
-# Setup
-
-1. Copy the files under src folder to your server end which can be accessible from your web app.
+#Steps
+1. Copy the files under src folder to your server end which is accessible from your web app.
 
 ```
 src\connect.php
@@ -52,10 +39,8 @@ $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 <script src="URL/PATH/TO/polljoy.js"></script>
 ```
 
-
-### Get polls
-
-After you installed the PHP file in your server end and include the Javascript files, at where you want to get poll, include:
+###Get polls
+After you installed the PHP file in your server end and include the Javascript files, where you want to get polls, include:
 
 ``` html
 <script type="text/javascript">
@@ -68,9 +53,9 @@ After you installed the PHP file in your server end and include the Javascript f
 </script>
 ```
 
-This is the simplest way to connect your webapp to the server end and start session to polljoy. And get polls from polljoy. When polls are returned, you will need to handle them and present the polls with the callbacks (check below).
+This is the simplest way to connect your webapp to the server end and start a session to polljoy. When polls are returned, you will need to handle them and present the polls with the callbacks (see below).
 
-You can pass more selection criteria that match your poll settings in [admin panel](https://admin.polljoy.com). It looks like:
+You can pass more selection criteria that match your poll settings in [admin panel](https://admin.polljoy.com). Syntax:
 
 ``` html
 <script type="text/javascript">
@@ -90,31 +75,28 @@ You can pass more selection criteria that match your poll settings in [admin pan
 </script>
 ```
 
-All the parameters are optional. You can use these parameters to select the specific target users to answer your polls
+`DEVICE_ID` (optional) your can pass your user's id, email or whatever unique key to identify your user. If you webapp is running on mobile, it can be the mobile UUID. Your if you skip this, our plug-in will automatically create one for you from the HTTP AGENT and IP Address
 
-`DEVICE_ID` - your can pass your user's id, email or whatever unique key to identify your user. If you webapp is running on mobile, it can be the mobile UUID. Your don't can skip this, plug-in will automatically create one for your from the HTTP AGENT and IP Address
+`USER_TYPE` - select either **Pay** or **Non-Pay** users of your service.
 
-`USER_TYPE` - select either **Pay** or **Non-Pay** users of your app.
+`APP_VERSION` (optional) Set to nil if you prefer not to send it.  Or you can choose to pass it. eg 1.0.35
 
-`APP_VERSION` - your app's version to be used as a poll selection criteria. This should match with your poll setting. Or set it as nil if you are not using.
+`LEVEL` (optional) Set as 0 if you prefer not to send it. If your app has levels you can pass them here. eg 34 
 
-`LEVEL` - if your app is a game, this is your game level. This should match with your poll setting. Or set it as 0 if you are not using.
+`SESSION_COUNT` (optional) Set it as 0 or you can manually send it. eg 3 
 
-`SESSION_COUNT` - if you have session control, you can pass this to match with your poll setting to get the correct poll for your user.
+`TIME_SINCE_INSTALL` (optional) If your app tracks how long your users have been using your app, you can pass this if desired.
 
-`TIME_SINCE_INSTALL` - if your app tracks how long your users have been using your app, you can pass this to select the right poll.
+`TAGNAME,TAGNAME#RANGE` - (optional) Set to null if you aren't using them.  If your app uses tags to select polls, pass them in string format with as many as you want to send - `TAG,TAG, ... ,TAG`.  TAG is either in the format TAGNAME or TAGNAME:VALUE.  They should match what you defined in the web console. An example of sending back user gender, number of friends and where the poll is being called from could be: `FEMALE,FRIENDS#88,SHOPSCREEN`
 
-`TAGNAME,TAGNAME#RANGE` - if you app uses tags to select polls, you pass the tags here. Please remember this needs to match your settings in admin panel. For example, if you want to ask the specific question to male users that just turned adults, you can put the tag like this: `MALE,AGE#18` 
-
-### Handle callbacks from plug-in (optional)
-
-polljoy will inform your app at different stages when polls are downloaded, ready to show, user responded etc. App can optionally implement the javascript functions to control the app logic via callbacks from 'polljoy' object. The javascript functions are:
+### Callbacks (optional)
+polljoy will inform your app at different stages when polls are downloaded, ready to show, user responded etc. Your app can optionally implement the javascript functions to control the app logic via callbacks from 'polljoy' object. The javascript functions are:
 
  ``` javascript
  function PJPollNotAvailable(status);
  ```
 
-When there is no poll match with your selection criteria or no more polls to show in the current session.
+When there is no poll matching your selection criteria or no more polls to show in the current session.
 
 Status can be:
 0 - session registration success
@@ -131,17 +113,16 @@ Status can be:
  function PJPollIsReady(polls);
  ```
  
- After you request for poll and poll/s is/are ready to show (including all defined images are downloaded). Friendly tip - If you are displaying the poll in the middle of an active game or app session that needs real time control, consider to pause your app before presenting the poll UI as needed. 
- 
- polls array returned are all the matched polls for the request. Please check below for the data structure.
- 
- When you're ready to present the poll, call:
+When poll/s is/are ready to show (including all associated images). Friendly tip - If you are displaying the poll in the middle of an active game or app session that needs real time control, consider to pause your app before presenting the poll UI as needed. 
+
+The polls array returned are all the matched polls for the request. Please refer `PJPoll.h` for the data structure.
+When you’re ready to present the poll, call:
  
  ``` javascript
  polljoy('show');
  ```
  
- This will present the polljoy UI according to your app color and poll settings. Then polljoy plugin will handle all the remaining tasks for you. These include handling the user's response, informing delegate for any virtual amount user received, upload result to polljoy service ... etc.
+This will present the polljoy UI according to your app style and poll settings. Then the SDK will handle all the remaining tasks for you. These include handling the user’s response, informing delegate for any virtual amount user received, uploading the result to the console … etc.
 
 For example, the following code snippets will load the poll for the app once it is ready: 
  
@@ -154,52 +135,47 @@ function PJPollIsReady(polls)
 }
  ```
  
-  
-We highly recommend you implement the above callback function so that you know polls are ready and call polljoy plugin to show the poll or do whatever control you need.
- 
- 
- 
+We recommend you implement the above callback function so that you know polls are ready and call polljoy plugin to show the poll or do whatever control you need.
  
  ``` javascript
  function PJPollWillShow(poll);
  ```
  
- The polljoy poll UI is ready and will show. You can do whatever UI control as needed. Or simply ignore this implementation.
+The polljoy poll UI is ready and will show. You can do whatever UI control as needed. Or simply ignore this implementation.
  
  ``` javascript
  function PJPollDidShow:(poll);
  ```
  
- The polljoy poll UI is ready and has shown. You can do whatever UI control as needed. Or simply ignore this implementation.
+The polljoy poll UI is ready and has shown. You can do whatever UI control as needed. Or simply ignore this implementation.
+
  
  ``` javascript
  function PJPollWillDismiss:(poll);
  ```
  
- The polljoy poll UI is finished and will dismiss. You can do whatever UI control as needed. Or simply ignore this implementation. You can prepare your own UI before resuming your app before the polljoy poll UI is dismissed.
- 
+The polljoy poll UI is finished and will dismiss. You can do whatever UI control as needed. Or simply ignore this implementation. You can prepare your own UI before resuming your app before the polljoy poll UI is dismissed.
+
  ``` javascript
  function PJPollDidDismiss(poll);
  ```
  
- The polljoy poll UI is finished and has dismissed. You can do whatever UI control as needed. Or simply ignore this implementation. You can prepare your own UI to resume your app before the polljoy UI is dismissed. This is the last callback from polljoy and all polls are completed. You should resume your app if you have paused.
- 
+The polljoy poll UI is finished and has dismissed. You can do whatever UI control as needed. Or simply ignore this implementation. You can prepare your own UI to resume your app before the polljoy UI is dismissed. This is the last callback from polljoy and all polls are completed. You should resume your app if you have paused.
+
  ``` javascript
  function PJPollDidResponded(poll);
  ```
  
- User has responded to the poll. The poll will contain all the poll data including user's responses. You can ignore this (the results are displayed in the polljoy.com admin console and able to be exported) or use it as you wish.
- 
- If you issue a virtual currency amount to user, you MUST implement this function to handle the virtual amount issued (especially if your app is game). This is the only callback from SDK that informs the app the virtual amount that the user collected.
- 
+User has responded to the poll. The poll will contain all the poll data including user’s responses. You can ignore this (the results are displayed in the web admin console and able to be exported) or use it as you wish.
+If you issue a virtual currency amount to user, you MUST implement this method to handle the virtual amount issued. This is the only callback from SDK that informs the app the virtual amount that the user collected.
+
  ``` java
  function PJPollDidSkipped(poll);
  ```
  
- If the poll is not mandatory, user can choose to skip the poll. You can handle this case or simply ignore it safely.
- 
-### Poll object data structure
+ If the poll is not mandatory, the user can choose to skip the poll. You can handle this case or simply ignore it safely.
 
+### Poll object data structure
 All callbacks will return the associated poll in JSON format. data structure will look like:
 
 ```
@@ -262,6 +238,7 @@ note: The API will regularly update to open more data. Please always check the r
 ### Simple example
 Please see the example folder in the SDK for a simple integration. 
 
-
 -
-#### Got questions? Email us at help@polljoy.com
+That's it!  Email us at help@polljoy.com if you have questions or suggestions!
+
+ps - want to see some cute animals? [It's ok - we all do](https://polljoy.com/world.html)

@@ -232,10 +232,10 @@ note: The API will regularly update to open more data. Please always check the r
  function PJPollIsReady(polls);
  ```
  
- it will be array of `Poll`
+ it will be an array of `Poll`
 
 
-### Simple example
+### Example
 Please see the example folder in the SDK for a simple integration. 
 
 -

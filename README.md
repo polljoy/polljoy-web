@@ -40,7 +40,7 @@ $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 ```
 
 ###Get polls
-After you installed the PHP file in your server end and include the Javascript files, where you want to get polls, include:
+So you have installed the PHP file in your server end and included the Javascript files. In the webpage where you want to get the polls, include the following code in the HTML file:
 
 ``` html
 <script type="text/javascript">

@@ -1,6 +1,6 @@
 ![Picture](http://www.polljoy.com/assets/images/logo/polljoy-logo-github.png)
 
-In-app polls made easy. Just 2 API calls.
+In-app polls made easy. Just 2 API calls. Find out why users leave and get instant user feedback. Stats tell you what, polljoy tells you why.
 
 
 #Intro

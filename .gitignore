@@ -1,1 +1,3 @@
-server
+.gitignore
+server/
+res.polljoy.com/

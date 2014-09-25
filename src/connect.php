@@ -9,8 +9,8 @@ $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 /* unset($_SESSION); */
 
 session_start();
-$backend = 'https://api.polljoy.com/poll/';
-//$backend = 'http://apisandbox.polljoy.com/poll/';
+$backend = 'https://api.polljoy.com/2.0/poll/';
+//$backend = 'http://apisandbox.polljoy.com/2.0/poll/';
 header('Access-Control-Allow-Origin: *');
 
 function getDevice() {
@@ -44,8 +44,102 @@ function createCurl() {
     return $curl;
 }
 
-if (isset($_GET['register'])) {
+function crypt1($text, $key, $alg, $crypt)
+{
+    $encrypted_data="";
+    switch($alg)
+    {
+        case "3des":
+            $td = mcrypt_module_open('tripledes', '', 'ecb', '');
+            break;
+        case "cast-128":
+            $td = mcrypt_module_open('cast-128', '', 'ecb', '');
+            break;
+        case "gost":
+            $td = mcrypt_module_open('gost', '', 'ecb', '');
+            break;
+        case "rijndael-128":
+            $td = mcrypt_module_open('rijndael-128', '', 'ecb', '');
+            break;
+        case "twofish":
+            $td = mcrypt_module_open('twofish', '', 'ecb', '');
+            break;
+        case "arcfour":
+            $td = mcrypt_module_open('arcfour', '', 'ecb', '');
+            break;
+        case "cast-256":
+            $td = mcrypt_module_open('cast-256', '', 'ecb', '');
+            break;
+        case "loki97":
+            $td = mcrypt_module_open('loki97', '', 'ecb', '');
+            break;
+        case "rijndael-192":
+            $td = mcrypt_module_open('rijndael-192', '', 'ecb', '');
+            break;
+        case "saferplus":
+            $td = mcrypt_module_open('saferplus', '', 'ecb', '');
+            break;
+        case "wake":
+            $td = mcrypt_module_open('wake', '', 'ecb', '');
+            break;
+        case "blowfish-compat":
+            $td = mcrypt_module_open('blowfish-compat', '', 'ecb', '');
+            break;
+        case "des":
+            $td = mcrypt_module_open('des', '', 'ecb', '');
+            break;
+        case "rijndael-256":
+            $td = mcrypt_module_open('rijndael-256', '', 'ecb', '');
+            break;
+        case "xtea":
+            $td = mcrypt_module_open('xtea', '', 'ecb', '');
+            break;
+        case "enigma":
+            $td = mcrypt_module_open('enigma', '', 'ecb', '');
+            break;
+        case "rc2":
+            $td = mcrypt_module_open('rc2', '', 'ecb', '');
+            break;
+        default:
+            $td = mcrypt_module_open('blowfish', '', 'ecb', '');
+            break;
+    }
 
+    $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+    $key = substr($key, 0, mcrypt_enc_get_key_size($td));
+    mcrypt_generic_init($td, $key, $iv);
+
+    if($crypt)
+    {
+        $encrypted_data = urlsafe_b64encode(mcrypt_generic($td, $text));
+    }
+    else
+    {
+        $encrypted_data = mdecrypt_generic($td, urlsafe_b64decode($text));
+    }
+
+    mcrypt_generic_deinit($td);
+    mcrypt_module_close($td);
+
+    return $encrypted_data;
+}
+
+function urlsafe_b64encode($string) {
+    $data = base64_encode($string);
+    $data = str_replace(array('+','/','='),array('-','_',''),$data);
+    return $data;
+}
+
+function urlsafe_b64decode($string) {
+    $data = str_replace(array('-','_'),array('+','/'),$string);
+    $mod4 = strlen($data) % 4;
+    if ($mod4) {
+        $data .= substr('====', $mod4);
+    }
+    return base64_decode($data);
+}
+
+if (isset($_GET['register'])) {
 
     if (isset($_POST['deviceId']) && !($_POST['deviceId'] == $_SESSION['device_id'])) {
         unset($_SESSION['current_session']);
@@ -56,6 +150,7 @@ if (isset($_GET['register'])) {
         if (isset($_POST['deviceId'])) {
             $data_in['deviceId'] = $_POST['deviceId'];
         }
+
         $curl = createCurl();
         curl_setopt($curl, CURLOPT_URL, $backend . 'registerSession.json');
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data_in));
@@ -85,21 +180,10 @@ if (isset($_GET['sg'])) {
             $data[$k] = $v;
         }
     }
- 
-    
+
     $data['deviceModel'] = getDevice();
     $data['platform'] = 'web';
     $data['osVersion'] = getOs();
-
-    /*
-     * userType: 'Pay',
-      appVersion: '',
-      deviceId: '123468',
-      level: '',
-      sessionCount: '',
-      timeSinceInstall: '',
-      tags: ''
-     */
 
     $a = array('appVersion', 'level', 'sessionCount', 'timeSinceInstall', 'tags');
     foreach ($a as $key) {
@@ -137,5 +221,3 @@ if (isset($_GET['response'])) {
     echo curl_exec($curl);
     die();
 }
-
-

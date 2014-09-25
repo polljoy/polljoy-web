@@ -236,7 +236,72 @@ note: The API will regularly update to open more data. Please always check the r
 
 
 ### Example
-Please see the example folder in the SDK for a simple integration. 
+
+ You can copy the follow code sample the page you want to integrate polljoy and modify it for all callbacks handling to suit your implementation.
+
+ ``` html
+ <script id="polljoy-integration" type="text/javascript">
+    jQuery(document).ready(function()
+        {
+             function PJPollIsReady(polls)
+             {
+                 console.log('PJPollIsReady', polls);
+                 polljoy('show'); // show polls when ready; or call at where you want
+             }
+
+             function PJPollNotAvailable(status)
+             {
+                 console.log('PJPollNotAvailable', status);
+             }
+
+             function PJPollWillShow(poll)
+             {
+                 console.log('PJPollWillShow', poll);
+             }
+
+             function PJPollDidShow(poll)
+             {
+                 console.log('PJPollDidShow', poll);
+             }
+
+             function PJPollWillDismiss(poll)
+             {
+                 console.log('PJPollWillDismiss', poll);
+             }
+
+             function PJPollDidDismiss(poll)
+             {
+                 console.log('PJPollDidDismiss', poll);
+             }
+
+             function PJPollDidResponded(poll)
+             {
+                 console.log('PJPollDidResponded', poll);
+             }
+
+             function PJPollDidSkipped(poll)
+             {
+                 console.log('PJPollDidSkipped', poll);
+             }
+
+             function getPoll() {
+                 polljoy({
+                     endPoint: 'URL/TO/YOUR/SERVER/END/connect.php',
+                     deviceId: 'DEVICE_ID',
+                     userType: 'USER_TYPE',
+                     appVersion: 'APP_VERSION',
+                     level: 'LEVEL',
+                     osVersion: 'OS_VESION',
+                     sessionCount: 'SESSION_COUNT',
+                     timeSinceInstall: 'TIME_SINCE_INSTALL',
+                     tags: 'TAGNAME,TAGNAME#RANGE'
+                 });
+             }
+        )
+    };
+ </script>
+ ```
+Please see the example folder in the SDK for a simple integration.
 
 -
 That's it!  Email us at help@polljoy.com if you have questions or suggestions!

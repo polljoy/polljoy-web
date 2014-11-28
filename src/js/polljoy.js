@@ -60,6 +60,46 @@ var PJPollDidSkipped;
     var viewMode='';
     var testMode='0';
     var devices = {
+        'iphone6-portrait':{
+            'aspectRatio' : '16x9',
+            'deviceSettings': {
+                'width':'263px',
+                'height':'544px',
+                'right': '0',
+                'left': '0',
+                'top': '0',
+                'bottom':'0',
+                'margin': 'auto',
+                'background-image':'url("https://cdn.polljoy.com/img/device/iphone6_portrait.png")'
+            },
+            'overlaySettings': {
+                'position' : 'relative',
+                // 'right' : '25px',
+                'top' : '61.5px',
+                // 'border': 'none',
+                'width': '240px',
+                'height': '426px'
+            }
+        },
+        'iphone6-landscape':{
+            'aspectRatio' : '16x9',
+            'deviceSettings': {
+                'width':'438.5px',
+                'height':'211.5px',
+                'right': '0',
+                'left': '0',
+                'top': '0',
+                'bottom':'0',
+                'margin': 'auto',
+                'background-image':'url("https://cdn.polljoy.com/img/device/iphone6_landscape.png")'
+            },
+            'overlaySettings' :{
+                'position' : 'relative',
+                'top' : '9.5px',
+                'width': '341px',
+                'height': '192px'
+            }
+        },
         'iphone5-portrait':{
             'aspectRatio' : '16x9',
             'deviceSettings': {
@@ -468,19 +508,23 @@ var PJPollDidSkipped;
                                 methods.imageLoaded();
                             };
                             // set preload image queue
+                            var pollImagesCount=0;
                             for (var i = 0; i < polls.length; i++) {
                                 if ((polls[i].PollRequest.pollImageUrl != null) && (polls[i].PollRequest.pollImageUrl.length > 0)){
                                     loadedImages["poll"+(i+1).toString()+"Image"] = polls[i].PollRequest.pollImageUrl;
+                                    pollImagesCount++;
                                 }
                                 //preload poll reward currency image
                                 if ((polls[i].PollRequest.pollRewardImageUrl != null) && (polls[i].PollRequest.pollRewardImageUrl.length > 0)){
                                     loadedImages["poll"+(i+1).toString()+"CurrencyImage"] = polls[i].PollRequest.pollRewardImageUrl;
+                                    pollImagesCount++;
                                 }
 
                                 //preload image poll images
                                 if (polls[i].PollRequest.type == "I"){
                                     for (var j = 0; j < polls[i].PollRequest.choices.length; j++) {
                                         loadedImages["poll"+(i+1).toString()+"ChoiceImage"+(j+1).toString()] = polls[i].PollRequest.choiceImageUrl[polls[i].PollRequest.choices[j]];
+                                        pollImagesCount++;
                                     }
                                 }
                             }
@@ -502,8 +546,8 @@ var PJPollDidSkipped;
                                         jQuery('<img/>').attr('src', polls[i].PollRequest.choiceImageUrl[polls[i].PollRequest.choices[j]]).load(imagePreloadComplete("poll"+(i+1).toString()+"ChoiceImage"+(j+1).toString()));
                                     }
                                 }
-
                             }
+                            if (pollImagesCount === 0) methods.imageLoaded();
                         }
                         else
                         {
@@ -530,6 +574,7 @@ var PJPollDidSkipped;
                     {
                         PJPollIsReady(polls);
                     }
+                    //jQuery("#polljoy_poll").css("visibility", "visible");
                 }
             }
         },
@@ -1343,6 +1388,7 @@ var PJPollDidSkipped;
             jQuery('#polljoy_pollview_reward_earn2').css('color','#' + app.fontColor);
             jQuery('.polljoy-pollview-btn').css('color','#' + app.buttonFontColor);
             jQuery('.polljoy-pollview-ip-confirm-btn').css('color','#' + app.buttonFontColor);
+            jQuery('.polljoy-pollview-ip-confirm-btn').css('background','#' + app.buttonColor);
 
             buttonImageUrl = orientation=='L'?buttonImage_L:buttonImage_P;
             if ((buttonImageUrl !== null) && (buttonImageUrl.length > 0)) {
@@ -1352,7 +1398,6 @@ var PJPollDidSkipped;
             }
             else {
                 jQuery('.polljoy-pollview-btn').css('background','#' + app.buttonColor);
-                jQuery('.polljoy-pollview-ip-confirm-btn').css('background','#' + app.buttonColor);
                 if (app.buttonShadow==1)
                     jQuery('.polljoy-pollview-btn').css('box-shadow','2px 2px #9E9E9E');
                 else

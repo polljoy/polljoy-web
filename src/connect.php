@@ -141,7 +141,7 @@ function urlsafe_b64decode($string) {
 
 if (isset($_GET['register'])) {
 
-    if (isset($_POST['deviceId']) && !($_POST['deviceId'] == $_SESSION['device_id'])) {
+    if (isset($_POST['deviceId']) && isset($_SESSION['device_id']) && !($_POST['deviceId'] == $_SESSION['device_id'])) {
         unset($_SESSION['current_session']);
     }
 

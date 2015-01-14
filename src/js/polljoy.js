@@ -1,4 +1,4 @@
-/* SDK version 2.1, use api version 2.1 */
+/* SDK version 2.2.1, use api version 2.2 */
 
 var PJPollIsReady;
 var PJPollNotAvailable;
@@ -61,6 +61,10 @@ var PJPollDidSkipped;
     var viewDeviceName='';
     var viewMode='';
     var testMode='0';
+    var answeredButton;
+    var msgToShow;
+    var customSound;
+    var msgShowTime = 2.0;
     var devices = {
         'iphone6-portrait':{
             'aspectRatio' : '16x9',
@@ -483,6 +487,11 @@ var PJPollDidSkipped;
                         });
                     }
 
+                    // load custom sound
+                    if ((app.customSoundUrl != null) && (app.customSoundUrl.length > 0)) {
+                        customSound = new Audio(app.customSoundUrl);
+                    }
+
                     /*now get the polls for this app*/
                     /*url: connector + 'smartget.json',*/
                     var smartget = jQuery.ajax({
@@ -501,7 +510,6 @@ var PJPollDidSkipped;
                         }
                     });
                     smartget.done(function(sgResponse){
-                        // TODO: add preload all child poll images
                         polls = sgResponse.polls;
                         if (typeof polls !== 'undefined' && polls.length > 0)
                         {
@@ -556,16 +564,6 @@ var PJPollDidSkipped;
                                     }
                                 }
                             }
-
-                            /*
-                            for (var i = 0; i < polls.length; i++) {
-                                if (polls[i].PollRequest.childPolls !== 'undefined') {
-                                    if (polls[i].PollRequest.childPolls !== null) {
-                                        methods.preloadChildPollImages(polls[i].PollRequest.childPolls);
-                                    }
-                                }
-                            }
-                            */
 
                             if (pollImagesCount === 0) methods.imageLoaded();
                         }
@@ -692,7 +690,6 @@ var PJPollDidSkipped;
                     methods.switchOrientation.apply(thisObject);
                     methods.layoutView.apply(thisObject);
                     methods.drawNextQuestion.apply(thisObject);
-
 
                     if (typeof PJPollDidShow === 'function')
                     {
@@ -923,6 +920,7 @@ var PJPollDidSkipped;
                 jQuery('#polljoy_pollview_submit').unbind( 'click' );
                 jQuery('#polljoy_pollview_submit').html(submit).click(function()
                 {
+                    answeredButton = submit.parent();
                     methods.submitCurrentPoll.apply(thisObject);
                 });
             }
@@ -953,6 +951,7 @@ var PJPollDidSkipped;
                         e.preventDefault();
                         jQuery(container).find('a').removeClass('selected');
                         jQuery(button).addClass('selected');
+                        answeredButton = button.parent();
                         methods.submitCurrentPoll.apply(thisObject);
                     });
                     jQuery('#polljoy_pollview_row_button' + offset).show();
@@ -1017,9 +1016,10 @@ var PJPollDidSkipped;
                 confirmButton.hide();
                 confirmButton.unbind( 'click' );
                 confirmButton.click(function(e) {
+                    answeredButton = jQuery('#polljoy_pollview_ip_preview_button');
                     methods.submitCurrentPoll.apply(thisObject);
-                    jQuery('#polljoy_pollview_answer').css('width','');
-                    jQuery('#polljoy_pollview_answer').css('right','');
+                    //jQuery('#polljoy_pollview_answer').css('width','');
+                    //jQuery('#polljoy_pollview_answer').css('right','');
 
                 });
                 jQuery('#polljoy_pollview_mc_choices').hide();
@@ -1086,6 +1086,13 @@ var PJPollDidSkipped;
                 response = poll.choices[index];
             }
 
+            // TODO: check for reward answer
+            if (poll.virtualRewardAnswer != '') {
+                if (poll.virtualRewardAnswer != response) {
+                    poll.virtualAmount = 0;
+                }
+            }
+
             if (typeof PJPollDidResponded === 'function')
             {
                 poll.response = response;
@@ -1127,6 +1134,9 @@ var PJPollDidSkipped;
                 }
             }
 
+            methods.showThankyouMsg(answeredButton);
+
+            /*
             methods.drawFinaliseQuestion.apply(thisObject);
 
             // open external URL
@@ -1138,6 +1148,7 @@ var PJPollDidSkipped;
                     window.open(targetUrls[response]['web'], '_blank');
                 }
             }
+            */
         },
         finish: function()
         {
@@ -1482,8 +1493,8 @@ var PJPollDidSkipped;
                         jQuery('#polljoy_pollview_reward').css('right','auto');
                         jQuery('#polljoy_pollview_reward').css('width','auto');
                         jQuery('#polljoy_pollview_reward').css('top',(jQuery('.polljoy-pollview-thumbnail').width()/2) + 'px');
-                        // TODO: jQuery('#polljoy_pollview_reward').css('left',((jQuery('.polljoy-pollview-thumbnail').width() - jQuery('#polljoy_pollview_reward').width())/2) + 'px');
-                        jQuery('#polljoy_pollview_reward').css('left',((jQuery('.polljoy-pollview-thumbnail').width() - jQuery('#polljoy_pollview_reward').width())) + 'px');
+                        jQuery('#polljoy_pollview_reward').css('left',((jQuery('.polljoy-pollview-thumbnail').width() - jQuery('#polljoy_pollview_reward').width())/2) + 'px');
+                        //jQuery('#polljoy_pollview_reward').css('left',((jQuery('.polljoy-pollview-thumbnail').width() - jQuery('#polljoy_pollview_reward').width())) + 'px');
 
                     }
                     else {
@@ -1517,8 +1528,8 @@ var PJPollDidSkipped;
                         jQuery('#polljoy_pollview_reward').css('right','auto');
                         jQuery('#polljoy_pollview_reward').css('width','auto');
                         jQuery('#polljoy_pollview_reward').css('margin-top',((0.2174 *  jQuery('#polljoy_pollview_main').height()) + ((0.1085 * jQuery('#realtime_preview').height()) - jQuery('#realtime_preview_reward').height()) / 2) + 'px');
-                        // TODO: jQuery('#polljoy_pollview_reward').css('margin-left',((jQuery('#polljoy_pollview_main').width() - jQuery('#polljoy_pollview_reward').width())/2) + 'px');
-                        jQuery('#polljoy_pollview_reward').css('margin-left',((jQuery('#polljoy_pollview_main').width() - jQuery('#polljoy_pollview_reward').width())) + 'px');
+                        jQuery('#polljoy_pollview_reward').css('margin-left',((jQuery('#polljoy_pollview_main').width() - jQuery('#polljoy_pollview_reward').width())/2) + 'px');
+                        //jQuery('#polljoy_pollview_reward').css('margin-left',((jQuery('#polljoy_pollview_main').width() - jQuery('#polljoy_pollview_reward').width())) + 'px');
                     }
 
                     jQuery('.polljoy-pollview-ip-confirm-btn').css('width','75%');
@@ -1711,6 +1722,101 @@ var PJPollDidSkipped;
                     }
                 }
             };
+        },
+        showThankyouMsg: function(target) {
+            var poll = polls[current].PollRequest;
+            var reward = parseInt(poll.virtualAmount);
+
+            if (poll.type == "I") {
+                $('#polljoy_pollview_ip_preview_button').css('background-image','');
+                if (reward > 0) {
+                    var rewardImgUrl = $('#polljoy_pollview_reward_image').css('background-image').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,'');
+                    $('#polljoy_pollview_ip_confirm_button').html('<div style="display:table-cell; vertical-align: middle">'+'<div style="float:left"><img id="polljoy_pollview_message_reward_image" src="' +  rewardImgUrl +  '" style="vertical-align: middle; height: 65%; width:65%; float:right "></div><div style="text-align: left; padding-left: 5px;vertical-align: middle; display: table-cell;">' + poll.virtualAmount + "<br>" + poll.collectMsgText+'</div></div>');
+                    customSound.play();
+                }
+                else {
+                    $('#polljoy_pollview_ip_confirm_button').html('<div style="display:table-cell; vertical-align: middle">'+poll.thankyouMsgText+'</div>');
+                }
+                jQuery('.polljoy-pollview-ip-confirm-btn').css('background','');
+                jQuery('.polljoy-pollview-ip-confirm-btn').css('color','#' + app.fontColor);
+            }
+            else {
+                var msg = '<div class="polljoy-pollview-btn center-block" id="polljoy_pollview_message_button" style="color: #' + app.fontColor + '; background-color: transparent;">'
+                msg += '</div>';
+                msgToShow = jQuery(msg);
+
+                if (reward > 0) {
+                    var rewardImgUrl = $('#polljoy_pollview_reward_image').css('background-image').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,'');
+                    // collect msg
+                    msgToShow.html('<img id="polljoy_pollview_message_reward_image" src="' +  rewardImgUrl +  '" style="vertical-align: middle; height: 80%">' + ' ' + poll.virtualAmount + ((poll.type == "I")?"<br>":" ") + poll.collectMsgText);
+                    customSound.play();
+                }
+                else {
+                    // thank you msg
+                    msgToShow.html(poll.thankyouMsgText);
+                }
+
+                target.parent().append(msgToShow);
+                target.hide();
+            }
+
+            // disabe all other input
+            jQuery('#polljoy_pollview_close_btn').hide()
+            jQuery('#polljoy_pollview_reward').hide()
+            jQuery("[id*=_button]").each(function() {
+               jQuery(this).unbind('click');
+            });
+            jQuery('#polljoy_pollview_overlay_canvas').unbind('click');
+            jQuery('#polljoy_pollview_border_canvas').unbind('click');
+
+            if ((reward > 0) || (typeof(polls[current + 1]) == 'undefined'))
+            {
+                // open external URL
+                setTimeout( function() {
+
+                    // move to next poll
+                    if (typeof(polls[current + 1]) == 'undefined') {
+                       methods.hide.apply(thisObject);
+                    }
+                    else {
+                        methods.drawNextQuestion(thisObject);
+                    }
+
+                    if (poll.type === "I") {
+                        $('#polljoy_pollview_ip_confirm_button').html('<div style="display:table-cell; vertical-align: middle">Confirm</div>');
+                    }
+                    else  {
+                        target.show();
+                        msgToShow.remove();
+                    }
+
+                    var targetUrls=poll.choiceUrl;
+                    console.log(poll);
+                    if ((poll.type === 'M') || (poll.type === 'I'))
+                    {
+                        if ((targetUrls[response]['web'] !== null) && (targetUrls[response]['web'].length > 0))
+                        {
+                            window.open(targetUrls[response]['web'], '_blank');
+                        }
+                    }
+                }, msgShowTime *1000);
+            }
+            else {
+                if (typeof(polls[current + 1]) == 'undefined') {
+                   methods.hide.apply(thisObject);
+                }
+                else {
+                    methods.drawNextQuestion(thisObject);
+                }
+
+                if (poll.type === "I") {
+                    $('#polljoy_pollview_ip_confirm_button').html('<div style="display:table-cell; vertical-align: middle">Confirm</div>');
+                }
+                else  {
+                    target.show();
+                    msgToShow.remove();
+                }
+            }
         }
     };
 

@@ -63,7 +63,7 @@ var PJPollDidSkipped;
     var testMode='0';
     var answeredButton;
     var msgToShow;
-    var customSound;
+    var customSound=null;
     var msgShowTime = 2.0;
     var devices = {
         'iphone6-portrait':{
@@ -1086,7 +1086,6 @@ var PJPollDidSkipped;
                 response = poll.choices[index];
             }
 
-            // TODO: check for reward answer
             if (poll.virtualRewardAnswer != '') {
                 if (poll.virtualRewardAnswer != response) {
                     poll.virtualAmount = 0;
@@ -1732,7 +1731,7 @@ var PJPollDidSkipped;
                 if (reward > 0) {
                     var rewardImgUrl = $('#polljoy_pollview_reward_image').css('background-image').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,'');
                     $('#polljoy_pollview_ip_confirm_button').html('<div style="display:table-cell; vertical-align: middle">'+'<div style="float:left"><img id="polljoy_pollview_message_reward_image" src="' +  rewardImgUrl +  '" style="vertical-align: middle; height: 65%; width:65%; float:right "></div><div style="text-align: left; padding-left: 5px;vertical-align: middle; display: table-cell;">' + poll.virtualAmount + "<br>" + poll.collectMsgText+'</div></div>');
-                    customSound.play();
+                    if (customSound!=null) customSound.play();
                 }
                 else {
                     $('#polljoy_pollview_ip_confirm_button').html('<div style="display:table-cell; vertical-align: middle">'+poll.thankyouMsgText+'</div>');
@@ -1749,7 +1748,7 @@ var PJPollDidSkipped;
                     var rewardImgUrl = $('#polljoy_pollview_reward_image').css('background-image').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,'');
                     // collect msg
                     msgToShow.html('<img id="polljoy_pollview_message_reward_image" src="' +  rewardImgUrl +  '" style="vertical-align: middle; height: 80%">' + ' ' + poll.virtualAmount + ((poll.type == "I")?"<br>":" ") + poll.collectMsgText);
-                    customSound.play();
+                    if (customSound!=null) customSound.play();
                 }
                 else {
                     // thank you msg

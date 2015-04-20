@@ -31,7 +31,7 @@ function getOs() {
     $agent = $_SERVER['HTTP_USER_AGENT'];
     $agent = explode('(', $_SERVER['HTTP_USER_AGENT']);
     $agent = explode(')', $agent[1]);
-    return array_shift(explode(';', $agent[0]));
+    return @array_shift(explode(';', $agent[0]));
 }
 
 function createCurl() {

@@ -9,8 +9,8 @@ $deviceId = sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
 /* unset($_SESSION); */
 
 session_start();
-$backend = 'https://api.polljoy.com/2.2/poll/';
-//$backend = 'https://apisandbox.polljoy.com/2.2/poll/';
+$backend = 'https://api.polljoy.com/3.0/poll/';
+//$backend = 'https://apisandbox.polljoy.com/3.0/poll/';
 header('Access-Control-Allow-Origin: *');
 
 function getDevice() {
@@ -158,7 +158,7 @@ if (isset($_GET['register'])) {
             curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
         }
         $data = json_decode(curl_exec($curl));
-        unset($data->app->appId);
+        unset($data->session->appId);
         $_SESSION['current_session'] = json_encode($data);
         $_SESSION['device_id'] = $data_in['deviceId'];
         echo json_encode($data);
@@ -203,9 +203,9 @@ if (isset($_GET['sg'])) {
     curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
     $data = json_decode(curl_exec($curl));
     if (isset($data->polls) && is_array($data->polls)) {
+        unset($data->app->appId);
         foreach ($data->polls as $k => $v) {
             unset($data->polls[$k]->PollRequest->appId);
-            unset($data->polls[$k]->PollRequest->app->appId);
         }
     }
     echo json_encode($data);

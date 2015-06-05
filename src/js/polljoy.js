@@ -1,4 +1,4 @@
-/* SDK version 2.2.2.1, use api version 2.2 */
+/* SDK version 3.0, use api version 3.0 */
 
 var PJPollIsReady;
 var PJPollNotAvailable;
@@ -66,6 +66,8 @@ var PJPollDidSkipped;
     var customSound=null;
     var customTapSound=null;
     var msgShowTime = 1.5;
+    var mauLimitReached;
+    var activeMau;
     var devices = {
         'iphone6-portrait':{
             'aspectRatio' : '16x9',
@@ -381,7 +383,7 @@ var PJPollDidSkipped;
             });
 
             registerSession.done(function(response){
-                if (response.status === 1)
+                if (response.status !== 0)  // AM, 20150508
                 {
                     console.log('registerSession.json returned error!');
                     if (typeof PJPollNotAvailable === 'function')
@@ -391,111 +393,11 @@ var PJPollDidSkipped;
                     return false;
                 }
                 else {
-                    app = response.app;
-
-                    background = response.app.backgroundColor;
-                    border = response.app.borderColor;
-                    font = response.app.fontColor;
-                    buttonColor = response.app.buttonColor;
-
-                    sessionId = response.app.sessionId;
-                    deviceId = response.app.deviceId;
-
-                    //preload app images
-                    //preload app default image
-                    if ((app.defaultImageUrl !== null) && (app.defaultImageUrl.length > 0)){
-                        loadedImages.defaultImage=false;
-                        jQuery('<img/>').attr('src', app.defaultImageUrl).load(function() {
-                            jQuery(this).remove();
-                            loadedImages.defaultImage=true;
-                            methods.imageLoaded();
-                        });
-                    }
-                    else {
-                        loadedImages.defaultImage=false;
-                        jQuery('<img/>').attr('src', 'https://res.polljoy.com/img/filler.png').load(function() {
-                            jQuery(this).remove();
-                            loadedImages.defaultImage=true;
-                            methods.imageLoaded();
-                        });
-                    }
-                    //preload border image
-                    if (viewDeviceName !== '') {
-                        orientation = viewMode.substring(0,1).toUpperCase();
-                        var deviceName = viewDeviceName + '-' + viewMode;
-
-                        borderImage_L = app['borderImageUrl_' + devices[deviceName]['aspectRatio'] + '_L'];
-                        borderImage_P = app['borderImageUrl_' + devices[deviceName]['aspectRatio'] + '_P'];
-                        buttonImage_L = app['buttonImageUrl_' + devices[deviceName]['aspectRatio'] + '_L'];
-                        buttonImage_P = app['buttonImageUrl_' + devices[deviceName]['aspectRatio'] + '_P'];
-                    }
-                    else {
-                        borderImage_L = app.borderImageUrl_4x3_L;
-                        borderImage_P = app.borderImageUrl_4x3_P;
-                        buttonImage_L = app.buttonImageUrl_4x3_L;
-                        buttonImage_P = app.buttonImageUrl_4x3_P;
-                    }
-
-                    if ((borderImage_L != null) && (borderImage_L.length > 0)) {
-                        loadedImages.borderImage_4x3_L=false;
-                        jQuery('<img/>').attr('src', borderImage_L).load(function() {
-                            jQuery(this).remove();
-                            loadedImages.borderImage_4x3_L=true;
-                            methods.imageLoaded();
-                        });
-                    }
-                    if ((borderImage_P != null) && (borderImage_P.length > 0)) {
-                        loadedImages.borderImage_4x3_P=false;
-                        jQuery('<img/>').attr('src', borderImage_P).load(function() {
-                            jQuery(this).remove();
-                            loadedImages.borderImage_4x3_P=true;
-                            methods.imageLoaded();
-                        });
-                    }
-                    //preload button image
-                    if ((buttonImage_L != null) && (buttonImage_L.length > 0)) {
-                        loadedImages.buttonImage_4x3_L=false;
-                        jQuery('<img/>').attr('src', buttonImage_L).load(function() {
-                            jQuery(this).remove();
-                            loadedImages.buttonImage_4x3_L=true;
-                            methods.imageLoaded();
-                        });
-                    }
-                    if ((buttonImage_P != null) && (buttonImage_P.length > 0)) {
-                        loadedImages.buttonImage_4x3_P=false;
-                        jQuery('<img/>').attr('src', buttonImage_P).load(function() {
-                            jQuery(this).remove();
-                            loadedImages.buttonImage_4x3_P=true;
-                            methods.imageLoaded();
-                        });
-                    }
-                    //preload close button image
-                    if ((app.closeButtonImageUrl != null) && (app.closeButtonImageUrl.length > 0)) {
-                        loadedImages.closeButtonImage=false;
-                        jQuery('<img/>').attr('src', app.closeButtonImageUrl).load(function() {
-                            jQuery(this).remove();
-                            loadedImages.closeButtonImage=true;
-                            methods.imageLoaded();
-                        });
-                    }
-                    //preload reward image
-                    if ((app.rewardImageUrl != null) && (app.rewardImageUrl.length > 0)) {
-                        loadedImages.rewardImageUrl=false;
-                        jQuery('<img/>').attr('src', app.rewardImageUrl).load(function() {
-                            jQuery(this).remove();
-                            loadedImages.rewardImageUrl=true;
-                            methods.imageLoaded();
-                        });
-                    }
-
-                    // load custom sound
-                    if ((app.customSoundUrl != null) && (app.customSoundUrl.length > 0)) {
-                        customSound = new Audio(app.customSoundUrl);
-                    }
-
-                    if ((app.customTapSoundUrl != null) && (app.customTapSoundUrl.length > 0)) {
-                        customTapSound = new Audio(app.customTapSoundUrl);
-                    }
+                    //var session = response.session;
+                    sessionId = response.session.sessionId;
+                    deviceId = response.session.deviceId;
+                    mauLimitReached = response.session.mauLimitReached;
+                    activeMau = response.session.activeMau;
 
                     /*now get the polls for this app*/
                     /*url: connector + 'smartget.json',*/
@@ -515,6 +417,113 @@ var PJPollDidSkipped;
                         }
                     });
                     smartget.done(function(sgResponse){
+                        // app AM 20150508
+                        app = sgResponse.app;
+
+                        background = app.backgroundColor;
+                        border = app.borderColor;
+                        font = app.fontColor;
+                        buttonColor = app.buttonColor;
+
+                        //preload app images
+                        //preload app default image
+                        if ((app.defaultImageUrl !== null) && (app.defaultImageUrl.length > 0)){
+                            loadedImages.defaultImage=false;
+                            jQuery('<img/>').attr('src', app.defaultImageUrl).load(function() {
+                                jQuery(this).remove();
+                                loadedImages.defaultImage=true;
+                                methods.imageLoaded();
+                            });
+                        }
+                        else {
+                            loadedImages.defaultImage=false;
+                            jQuery('<img/>').attr('src', 'https://res.polljoy.com/img/filler.png').load(function() {
+                                jQuery(this).remove();
+                                loadedImages.defaultImage=true;
+                                methods.imageLoaded();
+                            });
+                        }
+                        //preload border image
+                        if (viewDeviceName !== '') {
+                            orientation = viewMode.substring(0,1).toUpperCase();
+                            var deviceName = viewDeviceName + '-' + viewMode;
+
+                            borderImage_L = app['borderImageUrl_' + devices[deviceName]['aspectRatio'] + '_L'];
+                            borderImage_P = app['borderImageUrl_' + devices[deviceName]['aspectRatio'] + '_P'];
+                            buttonImage_L = app['buttonImageUrl_' + devices[deviceName]['aspectRatio'] + '_L'];
+                            buttonImage_P = app['buttonImageUrl_' + devices[deviceName]['aspectRatio'] + '_P'];
+                        }
+                        else {
+                            borderImage_L = app.borderImageUrl_4x3_L;
+                            borderImage_P = app.borderImageUrl_4x3_P;
+                            buttonImage_L = app.buttonImageUrl_4x3_L;
+                            buttonImage_P = app.buttonImageUrl_4x3_P;
+                        }
+
+                        if ((borderImage_L != null) && (borderImage_L.length > 0)) {
+                            loadedImages.borderImage_4x3_L=false;
+                            jQuery('<img/>').attr('src', borderImage_L).load(function() {
+                                jQuery(this).remove();
+                                loadedImages.borderImage_4x3_L=true;
+                                methods.imageLoaded();
+                            });
+                        }
+                        if ((borderImage_P != null) && (borderImage_P.length > 0)) {
+                            loadedImages.borderImage_4x3_P=false;
+                            jQuery('<img/>').attr('src', borderImage_P).load(function() {
+                                jQuery(this).remove();
+                                loadedImages.borderImage_4x3_P=true;
+                                methods.imageLoaded();
+                            });
+                        }
+                        //preload button image
+                        if ((buttonImage_L != null) && (buttonImage_L.length > 0)) {
+                            loadedImages.buttonImage_4x3_L=false;
+                            jQuery('<img/>').attr('src', buttonImage_L).load(function() {
+                                jQuery(this).remove();
+                                loadedImages.buttonImage_4x3_L=true;
+                                methods.imageLoaded();
+                            });
+                        }
+                        if ((buttonImage_P != null) && (buttonImage_P.length > 0)) {
+                            loadedImages.buttonImage_4x3_P=false;
+                            jQuery('<img/>').attr('src', buttonImage_P).load(function() {
+                                jQuery(this).remove();
+                                loadedImages.buttonImage_4x3_P=true;
+                                methods.imageLoaded();
+                            });
+                        }
+                        //preload close button image
+                        if ((app.closeButtonImageUrl != null) && (app.closeButtonImageUrl.length > 0)) {
+                            loadedImages.closeButtonImage=false;
+                            jQuery('<img/>').attr('src', app.closeButtonImageUrl).load(function() {
+                                jQuery(this).remove();
+                                loadedImages.closeButtonImage=true;
+                                methods.imageLoaded();
+                            });
+                        }
+                        //preload reward image
+                        if ((app.rewardImageUrl != null) && (app.rewardImageUrl.length > 0)) {
+                            loadedImages.rewardImageUrl=false;
+                            jQuery('<img/>').attr('src', app.rewardImageUrl).load(function() {
+                                jQuery(this).remove();
+                                loadedImages.rewardImageUrl=true;
+                                methods.imageLoaded();
+                            });
+                        }
+
+                        // load custom sound
+                        if ((app.customSoundUrl != null) && (app.customSoundUrl.length > 0)) {
+                            customSound = new Audio(app.customSoundUrl);
+                        }
+
+                        if ((app.customTapSoundUrl != null) && (app.customTapSoundUrl.length > 0)) {
+                            customTapSound = new Audio(app.customTapSoundUrl);
+                        }
+
+                        // END APP AM 20150508
+
+                        // polls
                         polls = sgResponse.polls;
                         if (typeof polls !== 'undefined' && polls.length > 0)
                         {
@@ -526,6 +535,9 @@ var PJPollDidSkipped;
                             // set preload image queue
                             var pollImagesCount=0;
                             for (var i = 0; i < polls.length; i++) {
+                                // AM 20150508
+                                polls[i].PollRequest['app'] = app;
+
                                 if ((polls[i].PollRequest.pollImageUrl != null) && (polls[i].PollRequest.pollImageUrl.length > 0)){
                                     loadedImages["poll"+(i+1).toString()+"Image"] = polls[i].PollRequest.pollImageUrl;
                                     pollImagesCount++;

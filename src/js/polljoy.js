@@ -1,4 +1,4 @@
-/* SDK version 3.0, use api version 3.0 */
+/* SDK version 3.0.1, use api version 3.0 */
 
 var PJPollIsReady;
 var PJPollNotAvailable;
@@ -417,6 +417,17 @@ var PJPollDidSkipped;
                         }
                     });
                     smartget.done(function(sgResponse){
+
+                        if (sgResponse.status !== 0)
+                        {
+                            if (typeof PJPollNotAvailable === 'function')
+                            {
+                                PJPollNotAvailable(sgResponse.status);
+                            }
+
+                            return;
+                        }
+
                         // app AM 20150508
                         app = sgResponse.app;
 
